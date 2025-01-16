@@ -46,11 +46,9 @@ public class PositionJointIOSim implements PositionJointIO {
     motorVoltages = new double[config.canIds().length];
     motorCurrents = new double[config.canIds().length];
 
-    gearBox = DCMotor.getKrakenX60Foc(1);
+    gearBox = DCMotor.getNEO(2);
 
-    sim =
-        new DCMotorSim(
-            LinearSystemId.createDCMotorSystem(gearBox, 0.01, 1.0 / config.gearRatio()), gearBox);
+    sim = new DCMotorSim(LinearSystemId.createDCMotorSystem(gearBox, 0.025, 83), gearBox);
 
     controller = new PIDController(0, 0, 0);
   }

@@ -11,7 +11,10 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
+import frc.robot.commands.CoralCommands;
 import frc.robot.commands.DriveCommands;
+import frc.robot.commands.presets.Presets;
+import frc.robot.subsystems.components.Components;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.drive.DriveConstants;
 import frc.robot.subsystems.drive.GyroIO;
@@ -22,6 +25,11 @@ import frc.robot.subsystems.drive.spark.ModuleIOSparkSim;
 import frc.robot.subsystems.drive.talon.ModuleIOTalonFX;
 import frc.robot.subsystems.drive.talon.PhoenixOdometryThread;
 import frc.robot.subsystems.drive.talon.TalonFXModuleConstants;
+import frc.robot.subsystems.position_joint.PositionJoint;
+import frc.robot.subsystems.position_joint.PositionJointConstants;
+import frc.robot.subsystems.position_joint.PositionJointIO;
+import frc.robot.subsystems.position_joint.PositionJointIONeo;
+import frc.robot.subsystems.position_joint.PositionJointIOSim;
 import frc.robot.subsystems.vision.Vision;
 import frc.robot.subsystems.vision.VisionConstants;
 import frc.robot.subsystems.vision.VisionIO;
@@ -44,6 +52,12 @@ public class RobotContainer {
 
   @SuppressWarnings("unused")
   private final Vision vision;
+
+  private final PositionJoint elevator;
+  private final PositionJoint coralWrist;
+  private final PositionJoint climber;
+
+  private final Components sim_components;
 
   // Simulation
   private SwerveDriveSimulation driveSimulation = null;
@@ -73,6 +87,20 @@ public class RobotContainer {
                 new VisionIOPhotonVision(
                     VisionConstants.camera0Name, VisionConstants.robotToCamera0));
 
+        elevator =
+            new PositionJoint(
+                new PositionJointIONeo("Elevator", PositionJointConstants.ELEVATOR_CONFIG),
+                PositionJointConstants.ELEVATOR_GAINS);
+
+        coralWrist =
+            new PositionJoint(
+                new PositionJointIONeo("Coral Wrist", PositionJointConstants.CORAL_WRIST_CONFIG),
+                PositionJointConstants.CORAL_WRIST_GAINS);
+
+        climber =
+            new PositionJoint(
+                new PositionJointIONeo("Climber", PositionJointConstants.CLIMBER_CONFIG),
+                PositionJointConstants.CLIMBER_GAINS);
         break;
 
       case SIM:
@@ -104,6 +132,20 @@ public class RobotContainer {
                     VisionConstants.robotToCamera1,
                     driveSimulation::getSimulatedDriveTrainPose));
 
+        elevator =
+            new PositionJoint(
+                new PositionJointIOSim("Elevator", PositionJointConstants.ELEVATOR_CONFIG),
+                PositionJointConstants.ELEVATOR_GAINS);
+
+        coralWrist =
+            new PositionJoint(
+                new PositionJointIOSim("Coral Wrist", PositionJointConstants.CORAL_WRIST_CONFIG),
+                PositionJointConstants.CORAL_WRIST_GAINS);
+
+        climber =
+            new PositionJoint(
+                new PositionJointIOSim("Climber", PositionJointConstants.CLIMBER_CONFIG),
+                PositionJointConstants.CLIMBER_GAINS);
         break;
 
       default:
@@ -117,8 +159,20 @@ public class RobotContainer {
                 new ModuleIO() {},
                 null);
         vision = new Vision(drive::addVisionMeasurement, new VisionIO() {}, new VisionIO() {});
+
+        elevator =
+            new PositionJoint(new PositionJointIO() {}, PositionJointConstants.ELEVATOR_GAINS);
+
+        coralWrist =
+            new PositionJoint(new PositionJointIO() {}, PositionJointConstants.CORAL_WRIST_GAINS);
+
+        climber = new PositionJoint(new PositionJointIO() {}, PositionJointConstants.CLIMBER_GAINS);
         break;
     }
+    new CoralCommands();
+    new Presets();
+
+    sim_components = new Components(elevator, coralWrist, climber);
 
     // Set up auto routines
     autoChooser = new LoggedDashboardChooser<>("Auto Choices", AutoBuilder.buildAutoChooser());
@@ -152,11 +206,12 @@ public class RobotContainer {
   private void configureButtonBindings() {
     // Default command, normal field-relative drive
     drive.setDefaultCommand(
-        DriveCommands.joystickDrive(
+        DriveCommands.joystickDriveAtAngleAssisted(
             drive,
             () -> -driverController.getLeftY(),
             () -> -driverController.getLeftX(),
-            () -> -driverController.getRightX()));
+            () -> -driverController.getRightX(),
+            () -> Rotation2d.fromDegrees(90)));
 
     // Lock to 0° when A button is held
     driverController
@@ -191,6 +246,11 @@ public class RobotContainer {
 
     // Reset gyro to 0° when B button is pressed
     driverController.b().onTrue(Commands.runOnce(resetGyro, drive).ignoringDisable(true));
+
+    Presets.L1.addCommand(elevator, coralWrist);
+    Presets.L2.addCommand(elevator, coralWrist);
+    Presets.L3.addCommand(elevator, coralWrist);
+    Presets.L4.addCommand(elevator, coralWrist);
   }
 
   /**

@@ -23,6 +23,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
+import org.littletonrobotics.junction.Logger;
 
 public class DriveCommands {
   private static final double DEADBAND = 0.1;
@@ -122,6 +123,92 @@ public class DriveCommands {
               double omega =
                   angleController.calculate(
                       drive.getRotation().getRadians(), rotationSupplier.get().getRadians());
+
+              // Convert to field relative speeds & send command
+              ChassisSpeeds speeds =
+                  new ChassisSpeeds(
+                      linearVelocity.getX() * drive.getMaxLinearSpeedMetersPerSec(),
+                      linearVelocity.getY() * drive.getMaxLinearSpeedMetersPerSec(),
+                      omega);
+              boolean isFlipped =
+                  DriverStation.getAlliance().isPresent()
+                      && DriverStation.getAlliance().get() == Alliance.Red;
+              speeds =
+                  ChassisSpeeds.fromFieldRelativeSpeeds(
+                      speeds,
+                      isFlipped
+                          ? drive.getRotation().plus(new Rotation2d(Math.PI))
+                          : drive.getRotation());
+              drive.runVelocity(speeds);
+            },
+            drive)
+
+        // Reset PID controller when command starts
+        .beforeStarting(() -> angleController.reset(drive.getRotation().getRadians()));
+  }
+
+  /**
+   * Field relative drive command using joystick for linear control and PID for angular control.
+   * Possible use cases include snapping to an angle, aiming at a vision target, or controlling
+   * absolute rotation with a joystick.
+   */
+  public static Command joystickDriveAtAngleAssisted(
+      Drive drive,
+      DoubleSupplier xSupplier,
+      DoubleSupplier ySupplier,
+      DoubleSupplier omegaSupplier,
+      Supplier<Rotation2d> rotationSupplier) {
+
+    // Create PID controller
+    ProfiledPIDController angleController =
+        new ProfiledPIDController(
+            ANGLE_KP,
+            0.0,
+            ANGLE_KD,
+            new TrapezoidProfile.Constraints(ANGLE_MAX_VELOCITY, ANGLE_MAX_ACCELERATION));
+    angleController.enableContinuousInput(-Math.PI, Math.PI);
+
+    // Construct command
+    return Commands.run(
+            () -> {
+              // Get linear velocity
+              Translation2d linearVelocity =
+                  getLinearVelocityFromJoysticks(xSupplier.getAsDouble(), ySupplier.getAsDouble());
+
+              // Calculate angular speed
+              double feedback =
+                  angleController.calculate(
+                      drive.getRotation().getRadians(), rotationSupplier.get().getRadians());
+
+              double error = angleController.getPositionError();
+
+              Logger.recordOutput("Drive Controller Error", Math.toDegrees(error));
+
+              double omega;
+
+              if (Math.abs(omegaSupplier.getAsDouble()) > 0.1) {
+                // if (Math.signum(omegaSupplier.getAsDouble()) != Math.signum(feedback)
+                //     || Math.abs(error) < Math.toRadians(10)) {
+                //   omega = omegaSupplier.getAsDouble();
+                // } else {
+                //   omega = feedback;
+                // }
+                omega = omegaSupplier.getAsDouble();
+              } else {
+                if (Math.abs(error) < Math.toRadians(20)) {
+                  omega = feedback;
+                } else {
+                  omega = omegaSupplier.getAsDouble();
+                }
+              }
+
+              // if (Math.abs(omegaSupplier.getAsDouble()) > 0.1
+              //     && Math.signum(omegaSupplier.getAsDouble()) == Math.signum(feedback)) {
+              //   omega = feedback;
+              // } else if (error < Math.toRadians(10)) {
+
+              //   omega = omegaSupplier.getAsDouble();
+              // }
 
               // Convert to field relative speeds & send command
               ChassisSpeeds speeds =
