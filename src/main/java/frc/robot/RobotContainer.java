@@ -206,12 +206,11 @@ public class RobotContainer {
   private void configureButtonBindings() {
     // Default command, normal field-relative drive
     drive.setDefaultCommand(
-        DriveCommands.joystickDriveAtAngleAssisted(
+        DriveCommands.joystickDrive(
             drive,
             () -> -driverController.getLeftY(),
             () -> -driverController.getLeftX(),
-            () -> -driverController.getRightX(),
-            () -> Rotation2d.fromDegrees(90)));
+            () -> -driverController.getRightX()));
 
     // Lock to 0° when A button is held
     driverController
@@ -251,6 +250,18 @@ public class RobotContainer {
     Presets.L2.addCommand(elevator, coralWrist);
     Presets.L3.addCommand(elevator, coralWrist);
     Presets.L4.addCommand(elevator, coralWrist);
+
+    Presets.A.addCommand(
+        drive,
+        () -> -driverController.getLeftY(),
+        () -> -driverController.getLeftX(),
+        () -> -driverController.getRightX());
+
+    Presets.B.addCommand(
+        drive,
+        () -> -driverController.getLeftY(),
+        () -> -driverController.getLeftX(),
+        () -> -driverController.getRightX());
   }
 
   /**

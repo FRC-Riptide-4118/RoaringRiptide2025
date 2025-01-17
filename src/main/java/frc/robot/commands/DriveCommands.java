@@ -187,29 +187,20 @@ public class DriveCommands {
               double omega;
 
               if (Math.abs(omegaSupplier.getAsDouble()) > 0.1) {
-                // if (Math.signum(omegaSupplier.getAsDouble()) != Math.signum(feedback)
-                //     || Math.abs(error) < Math.toRadians(10)) {
-                //   omega = omegaSupplier.getAsDouble();
-                // } else {
-                //   omega = feedback;
-                // }
                 omega = omegaSupplier.getAsDouble();
+
+                // Square rotation value for more precise control
+                omega = Math.copySign(omega * omega, omega) * drive.getMaxAngularSpeedRadPerSec();
               } else {
-                if (Math.abs(error) < Math.toRadians(20)) {
+                if (Math.abs(error) < Math.toRadians(30)) {
                   omega = feedback;
                 } else {
                   omega = omegaSupplier.getAsDouble();
+
+                  // Square rotation value for more precise control
+                  omega = Math.copySign(omega * omega, omega) * drive.getMaxAngularSpeedRadPerSec();
                 }
               }
-
-              // if (Math.abs(omegaSupplier.getAsDouble()) > 0.1
-              //     && Math.signum(omegaSupplier.getAsDouble()) == Math.signum(feedback)) {
-              //   omega = feedback;
-              // } else if (error < Math.toRadians(10)) {
-
-              //   omega = omegaSupplier.getAsDouble();
-              // }
-
               // Convert to field relative speeds & send command
               ChassisSpeeds speeds =
                   new ChassisSpeeds(
