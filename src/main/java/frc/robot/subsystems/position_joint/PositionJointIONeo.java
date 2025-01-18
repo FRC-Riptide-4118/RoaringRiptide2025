@@ -83,8 +83,8 @@ public class PositionJointIONeo implements PositionJointIO {
             .idleMode(IdleMode.kBrake)
             .apply(
                 new EncoderConfig()
-                    .positionConversionFactor(config.gearRatio())
-                    .velocityConversionFactor(config.gearRatio()));
+                    .positionConversionFactor(1.0 / config.gearRatio())
+                    .velocityConversionFactor(config.gearRatio() / 60.0));
 
     switch (config.encoderType()) {
       case INTERNAL:
@@ -95,6 +95,9 @@ public class PositionJointIONeo implements PositionJointIO {
 
         motors[0].configure(
             leaderConfig, ResetMode.kNoResetSafeParameters, PersistMode.kNoPersistParameters);
+
+        motors[0].getEncoder().setPosition(0);
+
         break;
       case EXTERNAL_CANCODER:
         externalEncoder =
@@ -203,8 +206,9 @@ public class PositionJointIONeo implements PositionJointIO {
   public void updateInputs(PositionJointIOInputs inputs) {
     currentPosition = motors[0].getEncoder().getPosition();
     inputs.outputPosition = currentPosition;
-
     inputs.desiredPosition = positionSetpoint;
+
+    inputs.velocity = motors[0].getEncoder().getVelocity();
     inputs.desiredVelocity = velocitySetpoint;
 
     for (int i = 0; i < motors.length; i++) {

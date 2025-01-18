@@ -55,8 +55,8 @@ public class FlywheelIONeo implements FlywheelIO {
             .inverted(config.reversed()[0])
             .apply(
                 new EncoderConfig()
-                    .positionConversionFactor(config.gearRatio())
-                    .velocityConversionFactor(config.gearRatio()));
+                    .positionConversionFactor(1.0 / config.gearRatio())
+                    .velocityConversionFactor(1.0 / config.gearRatio()));
 
     motors[0].configure(
         leaderConfig, ResetMode.kNoResetSafeParameters, PersistMode.kNoPersistParameters);

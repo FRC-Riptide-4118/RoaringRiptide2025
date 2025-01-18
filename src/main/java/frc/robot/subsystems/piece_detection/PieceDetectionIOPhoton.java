@@ -1,5 +1,6 @@
 package frc.robot.subsystems.piece_detection;
 
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.Alert.AlertType;
 import frc.robot.subsystems.piece_detection.PieceDetectionConstants.PieceDetectionConfig;
@@ -34,6 +35,9 @@ public class PieceDetectionIOPhoton implements PieceDetectionIO {
         inputs.yaw = latestResult.getBestTarget().getYaw();
         inputs.pitch = latestResult.getBestTarget().getPitch();
         inputs.area = latestResult.getBestTarget().getArea();
+
+        inputs.distance = Units.feetToMeters(12.0 / Math.sqrt(inputs.area));
+        inputs.yDistance = inputs.distance * Math.tan(Math.toRadians(inputs.yaw));
 
         inputs.seesTarget = true;
       } else {

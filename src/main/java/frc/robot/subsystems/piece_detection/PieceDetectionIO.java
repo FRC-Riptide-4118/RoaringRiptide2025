@@ -11,6 +11,9 @@ public interface PieceDetectionIO {
     public double pitch = 0.0;
     public double area = 0.0;
 
+    public double distance = 0.0;
+    public double yDistance = 0.0;
+
     public boolean seesTarget = false;
   }
 
