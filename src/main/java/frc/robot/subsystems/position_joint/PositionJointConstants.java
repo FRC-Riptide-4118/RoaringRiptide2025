@@ -60,7 +60,8 @@ public class PositionJointConstants {
           Rotation2d.fromRotations(0.5),
           "");
 
-  public static final PositionJointGains SCRAPPY_POSITION_JOINT_GAINS =
+  public static final PositionJointGains MY_POSITION_JOINT_GAINS =
+      // NOTE: this code was for scrappy bot, might have to change to work on new robot
       new PositionJointGains(0.05, 0.00001, 0, 0.112, 0, 0.115, 0.008, 20, 30, 0, 100, 0, 0);
   // double kP,
   // double kI,
@@ -75,7 +76,8 @@ public class PositionJointConstants {
   // double kMaxPosition,
   // double kTolerance,
   // double kDefaultSetpoint
-  public static final PositionJointHardwareConfig SCRAPPY_POSITION_JOINT_CONFIG =
+  public static final PositionJointHardwareConfig MY_POSITION_JOINT_CONFIG =
+      // NOTE: this code was for scrappy bot, might have to change to work on new robot
       new PositionJointHardwareConfig(
           new int[] {20, 21},
           new boolean[] {false, true},

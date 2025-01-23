@@ -1,27 +1,40 @@
 package frc.robot;
 
+import com.pathplanner.lib.auto.AutoBuilder;
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
-import edu.wpi.first.wpilibj2.command.PrintCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
-import frc.robot.commands.position_joint.PositionJointPositionCommand;
-import frc.robot.subsystems.digital_sensor.DigitalSensor;
-import frc.robot.subsystems.digital_sensor.DigitalSensorConstants;
-import frc.robot.subsystems.digital_sensor.DigitalSensorIO;
-import frc.robot.subsystems.digital_sensor.DigitalSensorIODigitialInput;
-import frc.robot.subsystems.piece_detection.PieceDetection;
-import frc.robot.subsystems.piece_detection.PieceDetectionConstants;
-import frc.robot.subsystems.piece_detection.PieceDetectionIO;
-import frc.robot.subsystems.piece_detection.PieceDetectionIOPhoton;
+import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
+import frc.robot.commands.DriveCommands;
+import frc.robot.subsystems.drive.Drive;
+import frc.robot.subsystems.drive.DriveConstants;
+import frc.robot.subsystems.drive.GyroIO;
+import frc.robot.subsystems.drive.GyroIOPigeon2;
+import frc.robot.subsystems.drive.GyroIOSim;
+import frc.robot.subsystems.drive.ModuleIO;
+import frc.robot.subsystems.drive.spark.ModuleIOSparkSim;
+import frc.robot.subsystems.drive.talon.ModuleIOTalonFX;
+import frc.robot.subsystems.drive.talon.PhoenixOdometryThread;
+import frc.robot.subsystems.drive.talon.TalonFXModuleConstants;
 import frc.robot.subsystems.position_joint.PositionJoint;
 import frc.robot.subsystems.position_joint.PositionJointConstants;
 import frc.robot.subsystems.position_joint.PositionJointIO;
 import frc.robot.subsystems.position_joint.PositionJointIONeo;
+import frc.robot.subsystems.vision.Vision;
+import frc.robot.subsystems.vision.VisionConstants;
+import frc.robot.subsystems.vision.VisionIO;
+import frc.robot.subsystems.vision.VisionIOPhotonVision;
+import frc.robot.subsystems.vision.VisionIOPhotonVisionSim;
 import org.ironmaple.simulation.SimulatedArena;
+import org.ironmaple.simulation.drivesims.SwerveDriveSimulation;
 import org.littletonrobotics.junction.Logger;
+import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -31,148 +44,116 @@ import org.littletonrobotics.junction.Logger;
  */
 public class RobotContainer {
   // Subsystems
-  //   private final Drive drive;
+  private final Drive drive;
 
   @SuppressWarnings("unused")
-  //   private final Vision vision;
+  private final Vision vision;
 
-  private final DigitalSensor beambreak;
+  private final PositionJoint myPositionJoint;
 
-  private final DigitalSensor digitalsensor;
-
-  private final PositionJoint scrappyPositionJoint;
-
-  private final PieceDetection scrappyPieceDetection;
   // Simulation
-  //   private SwerveDriveSimulation driveSimulation = null;
+  private SwerveDriveSimulation driveSimulation = null;
 
   // Controller
   private final CommandXboxController driverController = new CommandXboxController(0);
 
   // Dashboard inputs
-  //   private final LoggedDashboardChooser<Command> autoChooser;
+  private final LoggedDashboardChooser<Command> autoChooser;
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
     switch (Constants.currentMode) {
       case REAL:
         // Real robot, instantiate hardware IO implementations
-        // drive =
-        //     new Drive(
-        //         new GyroIOPigeon2(0),
-        //         new ModuleIOTalonFX(TalonFXModuleConstants.frontLeft),
-        //         new ModuleIOTalonFX(TalonFXModuleConstants.frontRight),
-        //         new ModuleIOTalonFX(TalonFXModuleConstants.rearLeft),
-        //         new ModuleIOTalonFX(TalonFXModuleConstants.rearRight),
-        //         PhoenixOdometryThread.getInstance());
-        // vision =
-        //     new Vision(
-        //         drive::addVisionMeasurement,
-        //         new VisionIOPhotonVision(
-        //             VisionConstants.camera0Name, VisionConstants.robotToCamera0));
-        digitalsensor =
-            new DigitalSensor(
-                new DigitalSensorIODigitialInput("Switch", DigitalSensorConstants.SWITCH_CONFIG));
+        drive =
+            new Drive(
+                new GyroIOPigeon2(0),
+                new ModuleIOTalonFX(TalonFXModuleConstants.frontLeft),
+                new ModuleIOTalonFX(TalonFXModuleConstants.frontRight),
+                new ModuleIOTalonFX(TalonFXModuleConstants.rearLeft),
+                new ModuleIOTalonFX(TalonFXModuleConstants.rearRight),
+                PhoenixOdometryThread.getInstance());
+        vision =
+            new Vision(
+                drive::addVisionMeasurement,
+                new VisionIOPhotonVision(
+                    VisionConstants.camera0Name, VisionConstants.robotToCamera0));
 
-        beambreak =
-            new DigitalSensor(
-                new DigitalSensorIODigitialInput(
-                    "Beam break", DigitalSensorConstants.BEAMBREAK_CONFIG));
-
-        scrappyPositionJoint =
+        myPositionJoint =
             new PositionJoint(
                 new PositionJointIONeo(
-                    "Scrappy Position Joint", PositionJointConstants.SCRAPPY_POSITION_JOINT_CONFIG),
-                PositionJointConstants.SCRAPPY_POSITION_JOINT_GAINS);
-
-        scrappyPieceDetection =
-            new PieceDetection(
-                new PieceDetectionIOPhoton(
-                    "Scrappy Piece Detection", PieceDetectionConstants.config));
+                    "Position Joint", PositionJointConstants.MY_POSITION_JOINT_CONFIG),
+                PositionJointConstants.MY_POSITION_JOINT_GAINS);
         break;
 
       case SIM:
-        // // create a maple-sim swerve drive simulation instance
-        // driveSimulation =
-        //     new SwerveDriveSimulation(
-        //         DriveConstants.mapleSimConfig, new Pose2d(3, 3, new Rotation2d()));
-        // // add the simulated drivetrain to the simulation field
-        // SimulatedArena.getInstance().addDriveTrainSimulation(driveSimulation);
+        // create a maple-sim swerve drive simulation instance
+        driveSimulation =
+            new SwerveDriveSimulation(
+                DriveConstants.mapleSimConfig, new Pose2d(3, 3, new Rotation2d()));
+        // add the simulated drivetrain to the simulation field
+        SimulatedArena.getInstance().addDriveTrainSimulation(driveSimulation);
         // Sim robot, instantiate physics sim IO implementations
-        // drive =
-        //     new Drive(
-        //         new GyroIOSim(driveSimulation.getGyroSimulation()),
-        //         new ModuleIOSparkSim(driveSimulation.getModules()[0]),
-        //         new ModuleIOSparkSim(driveSimulation.getModules()[1]),
-        //         new ModuleIOSparkSim(driveSimulation.getModules()[2]),
-        //         new ModuleIOSparkSim(driveSimulation.getModules()[3]),
-        //         null);
+        drive =
+            new Drive(
+                new GyroIOSim(driveSimulation.getGyroSimulation()),
+                new ModuleIOSparkSim(driveSimulation.getModules()[0]),
+                new ModuleIOSparkSim(driveSimulation.getModules()[1]),
+                new ModuleIOSparkSim(driveSimulation.getModules()[2]),
+                new ModuleIOSparkSim(driveSimulation.getModules()[3]),
+                null);
 
-        // vision =
-        //     new Vision(
-        //         drive::addVisionMeasurement,
-        //         new VisionIOPhotonVisionSim(
-        //             VisionConstants.camera0Name,
-        //             VisionConstants.robotToCamera0,
-        //             driveSimulation::getSimulatedDriveTrainPose),
-        //         new VisionIOPhotonVisionSim(
-        //             VisionConstants.camera1Name,
-        //             VisionConstants.robotToCamera1,
-        //             driveSimulation::getSimulatedDriveTrainPose));
-
-        digitalsensor = new DigitalSensor(new DigitalSensorIO() {});
-
-        beambreak = new DigitalSensor(new DigitalSensorIO() {});
-
-        scrappyPositionJoint =
+        vision =
+            new Vision(
+                drive::addVisionMeasurement,
+                new VisionIOPhotonVisionSim(
+                    VisionConstants.camera0Name,
+                    VisionConstants.robotToCamera0,
+                    driveSimulation::getSimulatedDriveTrainPose),
+                new VisionIOPhotonVisionSim(
+                    VisionConstants.camera1Name,
+                    VisionConstants.robotToCamera1,
+                    driveSimulation::getSimulatedDriveTrainPose));
+        myPositionJoint =
             new PositionJoint(
-                new PositionJointIO() {}, PositionJointConstants.SCRAPPY_POSITION_JOINT_GAINS);
-
-        scrappyPieceDetection = new PieceDetection(new PieceDetectionIO() {});
-
+                new PositionJointIO() {}, PositionJointConstants.MY_POSITION_JOINT_GAINS);
         break;
 
       default:
         // Replayed robot, disable IO implementations
-        // drive =
-        //     new Drive(
-        //         new GyroIO() {},
-        //         new ModuleIO() {},
-        //         new ModuleIO() {},
-        //         new ModuleIO() {},
-        //         new ModuleIO() {},
-        //         null);
-        // vision = new Vision(drive::addVisionMeasurement, new VisionIO() {}, new VisionIO() {});
-
-        digitalsensor = new DigitalSensor(new DigitalSensorIO() {});
-        beambreak = new DigitalSensor(new DigitalSensorIO() {});
-        scrappyPositionJoint =
+        drive =
+            new Drive(
+                new GyroIO() {},
+                new ModuleIO() {},
+                new ModuleIO() {},
+                new ModuleIO() {},
+                new ModuleIO() {},
+                null);
+        vision = new Vision(drive::addVisionMeasurement, new VisionIO() {}, new VisionIO() {});
+        myPositionJoint =
             new PositionJoint(
-                new PositionJointIO() {}, PositionJointConstants.SCRAPPY_POSITION_JOINT_GAINS);
-
-        scrappyPieceDetection = new PieceDetection(new PieceDetectionIO() {});
-
+                new PositionJointIO() {}, PositionJointConstants.MY_POSITION_JOINT_GAINS);
         break;
     }
 
     // Set up auto routines
-    // autoChooser = new LoggedDashboardChooser<>("Auto Choices", AutoBuilder.buildAutoChooser());
+    autoChooser = new LoggedDashboardChooser<>("Auto Choices", AutoBuilder.buildAutoChooser());
 
     // Set up SysId routines
-    // autoChooser.addOption(
-    //     "Drive Wheel Radius Characterization", DriveCommands.wheelRadiusCharacterization(drive));
-    // autoChooser.addOption(
-    //     "Drive Simple FF Characterization", DriveCommands.feedforwardCharacterization(drive));
-    // autoChooser.addOption(
-    //     "Drive SysId (Quasistatic Forward)",
-    //     drive.sysIdQuasistatic(SysIdRoutine.Direction.kForward));
-    // autoChooser.addOption(
-    //     "Drive SysId (Quasistatic Reverse)",
-    //     drive.sysIdQuasistatic(SysIdRoutine.Direction.kReverse));
-    // autoChooser.addOption(
-    //     "Drive SysId (Dynamic Forward)", drive.sysIdDynamic(SysIdRoutine.Direction.kForward));
-    // autoChooser.addOption(
-    //     "Drive SysId (Dynamic Reverse)", drive.sysIdDynamic(SysIdRoutine.Direction.kReverse));
+    autoChooser.addOption(
+        "Drive Wheel Radius Characterization", DriveCommands.wheelRadiusCharacterization(drive));
+    autoChooser.addOption(
+        "Drive Simple FF Characterization", DriveCommands.feedforwardCharacterization(drive));
+    autoChooser.addOption(
+        "Drive SysId (Quasistatic Forward)",
+        drive.sysIdQuasistatic(SysIdRoutine.Direction.kForward));
+    autoChooser.addOption(
+        "Drive SysId (Quasistatic Reverse)",
+        drive.sysIdQuasistatic(SysIdRoutine.Direction.kReverse));
+    autoChooser.addOption(
+        "Drive SysId (Dynamic Forward)", drive.sysIdDynamic(SysIdRoutine.Direction.kForward));
+    autoChooser.addOption(
+        "Drive SysId (Dynamic Reverse)", drive.sysIdDynamic(SysIdRoutine.Direction.kReverse));
 
     // Configure the button bindings
     configureButtonBindings();
@@ -186,55 +167,46 @@ public class RobotContainer {
    */
   private void configureButtonBindings() {
     // Default command, normal field-relative drive
-    // drive.setDefaultCommand(
-    //     DriveCommands.joystickDrive(
-    //         drive,
-    //         () -> -driverController.getLeftY(),
-    //         () -> -driverController.getLeftX(),
-    //         () -> -driverController.getRightX()));
+    drive.setDefaultCommand(
+        DriveCommands.joystickDrive(
+            drive,
+            () -> -driverController.getLeftY(),
+            () -> -driverController.getLeftX(),
+            () -> -driverController.getRightX()));
 
     // Lock to 0° when A button is held
-    // driverController
-    //     .a()
-    //     .whileTrue(
-    //         DriveCommands.joystickDriveAtAngle(
-    //             drive,
-    //             () -> -driverController.getLeftY(),
-    //             () -> -driverController.getLeftX(),
-    //             () -> new Rotation2d()));
+    driverController
+        .a()
+        .whileTrue(
+            DriveCommands.joystickDriveAtAngle(
+                drive,
+                () -> -driverController.getLeftY(),
+                () -> -driverController.getLeftX(),
+                () -> new Rotation2d()));
 
     // Switch to X pattern when X button is pressed
-    // driverController.x().onTrue(Commands.runOnce(drive::stopWithX, drive));
+    driverController.x().onTrue(Commands.runOnce(drive::stopWithX, drive));
 
     // // Reset gyro / odometry
-    // final Runnable resetGyro =
-    //     Constants.currentMode == Constants.Mode.SIM
-    //         ? () ->
-    // drive.setPose(
-    // driveSimulation
-    // .getSimulatedDriveTrainPose()) // reset odometry to actual robot pose during
-    // simulation
-    // : () ->
-    //     drive.setPose(
-    //         new Pose2d(
-    //             drive.getPose().getTranslation(),
-    //             DriverStation.getAlliance().isPresent()
-    //                 ? (DriverStation.getAlliance().get() == DriverStation.Alliance.Red
-    //                     ? new Rotation2d(Math.PI)
-    //                     : new Rotation2d())
-    //                 : new Rotation2d())); // zero gyro
+    final Runnable resetGyro =
+        Constants.currentMode == Constants.Mode.SIM
+            ? () ->
+                drive.setPose(
+                    driveSimulation
+                        .getSimulatedDriveTrainPose()) // reset odometry to actual robot pose during
+            // simulation
+            : () ->
+                drive.setPose(
+                    new Pose2d(
+                        drive.getPose().getTranslation(),
+                        DriverStation.getAlliance().isPresent()
+                            ? (DriverStation.getAlliance().get() == DriverStation.Alliance.Red
+                                ? new Rotation2d(Math.PI)
+                                : new Rotation2d())
+                            : new Rotation2d())); // zero gyro
 
     // Reset gyro to 0° when B button is pressed
-    // driverController.b().onTrue(Commands.runOnce(resetGyro, drive).ignoringDisable(true));
-
-    beambreak.getTrigger().onTrue(new PrintCommand("true"));
-
-    // spinny
-    driverController
-        .b()
-        .and(driverController.a())
-        .onTrue(new PositionJointPositionCommand(scrappyPositionJoint, () -> 100))
-        .onFalse(new PositionJointPositionCommand(scrappyPositionJoint, () -> 0));
+    driverController.b().onTrue(Commands.runOnce(resetGyro, drive).ignoringDisable(true));
   }
 
   /**
@@ -243,22 +215,21 @@ public class RobotContainer {
    * @return the command to run in autonomous
    */
   public Command getAutonomousCommand() {
-    // return autoChooser.get();
-    return Commands.none();
+    return autoChooser.get();
   }
 
   public void resetSimulationField() {
     if (Constants.currentMode != Constants.Mode.SIM) return;
 
-    // driveSimulation.setSimulationWorldPose(drive.getPose());
+    driveSimulation.setSimulationWorldPose(drive.getPose());
     SimulatedArena.getInstance().resetFieldForAuto();
   }
 
   public void displaySimFieldToAdvantageScope() {
     if (Constants.currentMode != Constants.Mode.SIM) return;
 
-    // Logger.recordOutput(
-    //     "FieldSimulation/RobotPosition", driveSimulation.getSimulatedDriveTrainPose());
+    Logger.recordOutput(
+        "FieldSimulation/RobotPosition", driveSimulation.getSimulatedDriveTrainPose());
     Logger.recordOutput(
         "FieldSimulation/Coral",
         SimulatedArena.getInstance().getGamePiecesByType("Note").toArray(new Pose3d[0]));

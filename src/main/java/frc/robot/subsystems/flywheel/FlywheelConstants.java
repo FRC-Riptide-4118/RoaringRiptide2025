@@ -12,9 +12,4 @@ public class FlywheelConstants {
 
   public static final FlywheelGains EXAMPLE_GAINS =
       new FlywheelGains(0.2, 0.0, 0.0, 0.0, 0.065, 0.0, 1.0);
-
-  public static final FlywheelHardwareConfig SCRAPPYFLYWHEEL_CONFIG =
-      new FlywheelHardwareConfig(new int[] {20, 21}, new boolean[] {true, false}, 60.0 / 1.0, "");
-
-  public static final FlywheelGains SCRAPPYFLYWHEEL_GAINS = new FlywheelGains(0, 0, 0, 0, 0, 0, 0);
 }
