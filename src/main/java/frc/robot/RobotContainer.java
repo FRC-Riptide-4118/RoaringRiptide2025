@@ -22,6 +22,10 @@ import frc.robot.subsystems.drive.spark.ModuleIOSparkSim;
 import frc.robot.subsystems.drive.talon.ModuleIOTalonFX;
 import frc.robot.subsystems.drive.talon.PhoenixOdometryThread;
 import frc.robot.subsystems.drive.talon.TalonFXModuleConstants;
+import frc.robot.subsystems.flywheel.Flywheel;
+import frc.robot.subsystems.flywheel.FlywheelConstants;
+import frc.robot.subsystems.flywheel.FlywheelIO;
+import frc.robot.subsystems.flywheel.FlywheelIONeo;
 import frc.robot.subsystems.position_joint.PositionJoint;
 import frc.robot.subsystems.position_joint.PositionJointConstants;
 import frc.robot.subsystems.position_joint.PositionJointIO;
@@ -50,6 +54,8 @@ public class RobotContainer {
   private final Vision vision;
 
   private final PositionJoint myPositionJoint;
+
+  private final Flywheel myFlywheel;
 
   // Simulation
   private SwerveDriveSimulation driveSimulation = null;
@@ -84,6 +90,11 @@ public class RobotContainer {
                 new PositionJointIONeo(
                     "Position Joint", PositionJointConstants.MY_POSITION_JOINT_CONFIG),
                 PositionJointConstants.MY_POSITION_JOINT_GAINS);
+
+        myFlywheel =
+            new Flywheel(
+                new FlywheelIONeo("Flywheel", FlywheelConstants.MY_FLYWHEEL_CONFIG),
+                FlywheelConstants.MY_FLYWHEEL_GAINS);
         break;
 
       case SIM:
@@ -117,6 +128,8 @@ public class RobotContainer {
         myPositionJoint =
             new PositionJoint(
                 new PositionJointIO() {}, PositionJointConstants.MY_POSITION_JOINT_GAINS);
+
+        myFlywheel = new Flywheel(new FlywheelIO() {}, FlywheelConstants.MY_FLYWHEEL_GAINS);
         break;
 
       default:
@@ -130,9 +143,12 @@ public class RobotContainer {
                 new ModuleIO() {},
                 null);
         vision = new Vision(drive::addVisionMeasurement, new VisionIO() {}, new VisionIO() {});
+
         myPositionJoint =
             new PositionJoint(
                 new PositionJointIO() {}, PositionJointConstants.MY_POSITION_JOINT_GAINS);
+
+        myFlywheel = new Flywheel(new FlywheelIO() {}, FlywheelConstants.MY_FLYWHEEL_GAINS);
         break;
     }
 
