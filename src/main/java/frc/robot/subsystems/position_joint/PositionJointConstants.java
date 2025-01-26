@@ -59,4 +59,19 @@ public class PositionJointConstants {
           11,
           Rotation2d.fromRotations(0.5),
           "");
+
+  public static final PositionJointGains POSITION_JOINT_GAINS =
+      new PositionJointGains(0.05, 0.00001, 0, 0.112, 0, 0.115, 0.008, 20, 30, 0, 100, 0, 0);
+
+  public static final PositionJointHardwareConfig POSITION_JOINT_CONFIG =
+      new PositionJointHardwareConfig(
+          new int[] {20, 21},
+          new boolean[] {false, true},
+          1.0 / 1.0,
+          15,
+          GravityType.CONSTANT,
+          EncoderType.INTERNAL,
+          -1,
+          new Rotation2d(),
+          "");
 }

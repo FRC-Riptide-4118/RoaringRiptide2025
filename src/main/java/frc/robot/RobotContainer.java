@@ -24,6 +24,11 @@ import frc.robot.subsystems.drive.drive_motor.DriveMotorIOTalonFX;
 import frc.robot.subsystems.drive.gyro.GyroIO;
 import frc.robot.subsystems.drive.gyro.GyroIOPigeon2;
 import frc.robot.subsystems.drive.odometry_threads.PhoenixOdometryThread;
+import frc.robot.subsystems.position_joint.PositionJoint;
+import frc.robot.subsystems.position_joint.PositionJointConstants;
+import frc.robot.subsystems.position_joint.PositionJointIOReplay;
+import frc.robot.subsystems.position_joint.PositionJointIOSim;
+import frc.robot.subsystems.position_joint.PositionJointIOSparkMax;
 import frc.robot.subsystems.vision.Vision;
 import frc.robot.subsystems.vision.VisionConstants;
 import frc.robot.subsystems.vision.VisionIO;
@@ -43,6 +48,8 @@ public class RobotContainer {
 
   @SuppressWarnings("unused")
   private final Vision vision;
+
+  private final PositionJoint positionJoint;
 
   // Controller
   private final CommandXboxController driverController = new CommandXboxController(0);
@@ -90,8 +97,12 @@ public class RobotContainer {
                 drive::addVisionMeasurement,
                 new VisionIOPhotonVision(
                     VisionConstants.camera0Name, VisionConstants.robotToCamera0));
+        positionJoint =
+            new PositionJoint(
+                new PositionJointIOSparkMax(
+                    "Position Joint", PositionJointConstants.POSITION_JOINT_CONFIG),
+                PositionJointConstants.POSITION_JOINT_GAINS);
         break;
-
       case SIM:
         drive =
             new Drive(
@@ -126,6 +137,12 @@ public class RobotContainer {
                     VisionConstants.camera0Name, VisionConstants.robotToCamera0, drive::getPose),
                 new VisionIOPhotonVisionSim(
                     VisionConstants.camera1Name, VisionConstants.robotToCamera1, drive::getPose));
+
+        positionJoint =
+            new PositionJoint(
+                new PositionJointIOSim(
+                    "Position Joint", PositionJointConstants.POSITION_JOINT_CONFIG),
+                PositionJointConstants.POSITION_JOINT_GAINS);
         break;
 
       default:
@@ -155,6 +172,11 @@ public class RobotContainer {
                     AzimuthMotorConstants.BACK_RIGHT_GAINS),
                 null);
         vision = new Vision(drive::addVisionMeasurement, new VisionIO() {}, new VisionIO() {});
+
+        positionJoint =
+            new PositionJoint(
+                new PositionJointIOReplay("Position Joint"),
+                PositionJointConstants.POSITION_JOINT_GAINS);
         break;
     }
 
