@@ -29,6 +29,7 @@ import frc.robot.subsystems.position_joint.PositionJointConstants;
 import frc.robot.subsystems.position_joint.PositionJointIOReplay;
 import frc.robot.subsystems.position_joint.PositionJointIOSim;
 import frc.robot.subsystems.position_joint.PositionJointIOSparkMax;
+import frc.robot.subsystems.simulation.SimulationViewer;
 import frc.robot.subsystems.vision.Vision;
 import frc.robot.subsystems.vision.VisionConstants;
 import frc.robot.subsystems.vision.VisionIO;
@@ -50,6 +51,8 @@ public class RobotContainer {
   private final Vision vision;
 
   private final PositionJoint positionJoint;
+
+  private final SimulationViewer simulationViewer;
 
   // Controller
   private final CommandXboxController driverController = new CommandXboxController(0);
@@ -102,7 +105,9 @@ public class RobotContainer {
                 new PositionJointIOSparkMax(
                     "Position Joint", PositionJointConstants.POSITION_JOINT_CONFIG),
                 PositionJointConstants.POSITION_JOINT_GAINS);
+        simulationViewer = new SimulationViewer(positionJoint::getPosition);
         break;
+
       case SIM:
         drive =
             new Drive(
@@ -143,6 +148,8 @@ public class RobotContainer {
                 new PositionJointIOSim(
                     "Position Joint", PositionJointConstants.POSITION_JOINT_CONFIG),
                 PositionJointConstants.POSITION_JOINT_GAINS);
+
+        simulationViewer = new SimulationViewer(positionJoint::getPosition);
         break;
 
       default:
@@ -177,6 +184,8 @@ public class RobotContainer {
             new PositionJoint(
                 new PositionJointIOReplay("Position Joint"),
                 PositionJointConstants.POSITION_JOINT_GAINS);
+
+        simulationViewer = new SimulationViewer(positionJoint::getPosition);
         break;
     }
 
