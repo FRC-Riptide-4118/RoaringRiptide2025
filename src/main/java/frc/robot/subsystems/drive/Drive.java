@@ -32,6 +32,8 @@ import frc.robot.Constants;
 import frc.robot.Constants.Mode;
 import frc.robot.subsystems.drive.gyro.GyroIO;
 import frc.robot.subsystems.drive.gyro.GyroIOInputsAutoLogged;
+import frc.robot.subsystems.drive.odometry_threads.PhoenixOdometryThread;
+import frc.robot.subsystems.drive.odometry_threads.SparkOdometryThread;
 import frc.robot.util.pathplanner.AdvancedPPHolonomicDriveController;
 import frc.robot.util.pathplanner.LocalADStarAK;
 import java.util.concurrent.locks.Lock;
@@ -66,7 +68,8 @@ public class Drive extends SubsystemBase {
       Module frModuleIO,
       Module blModuleIO,
       Module brModuleIO,
-      Thread odometryThread) {
+      PhoenixOdometryThread phoenixOdometryThread,
+      SparkOdometryThread sparkOdometryThread) {
     this.gyroIO = gyroIO;
     modules[0] = flModule;
     modules[1] = frModuleIO;
@@ -77,8 +80,12 @@ public class Drive extends SubsystemBase {
     HAL.report(tResourceType.kResourceType_RobotDrive, tInstances.kRobotDriveSwerve_AdvantageKit);
 
     // Start odometry thread
-    if (odometryThread != null) {
-      odometryThread.start();
+    if (sparkOdometryThread != null) {
+      sparkOdometryThread.start();
+    }
+
+    if (phoenixOdometryThread != null) {
+      phoenixOdometryThread.start();
     }
 
     // Configure AutoBuilder for PathPlanner
@@ -159,7 +166,12 @@ public class Drive extends SubsystemBase {
       // Update gyro angle
       if (gyroInputs.connected) {
         // Use the real gyro angle
-        rawGyroRotation = gyroInputs.odometryYawPositions[i];
+        try {
+          rawGyroRotation = gyroInputs.odometryYawPositions[i];
+
+        } catch (Exception e) {
+
+        }
       } else {
         // Use the angle delta from the kinematics and module deltas
         Twist2d twist = kinematics.toTwist2d(moduleDeltas);

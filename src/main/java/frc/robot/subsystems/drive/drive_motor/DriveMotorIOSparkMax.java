@@ -105,6 +105,8 @@ public class DriveMotorIOSparkMax implements DriveMotorIO {
 
     inputs.desiredVelocityRotationsPerSecond = velocitySetpoint;
 
+    inputs.positionRotations = motors[0].getEncoder().getPosition();
+
     for (int i = 0; i < motors.length; i++) {
       motorsConnected[i] = motors[i].getLastError() == REVLibError.kOk;
 

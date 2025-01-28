@@ -104,7 +104,7 @@ public class AzimuthMotorIOSparkMax implements AzimuthMotorIO {
                     .withMagnetSensor(
                         new MagnetSensorConfigs()
                             .withSensorDirection(SensorDirectionValue.CounterClockwise_Positive)
-                            .withMagnetOffset(config.encoderOffset().getMeasure())));
+                            .withMagnetOffset(config.encoderOffset().getRotations())));
 
         encoderAlert =
             new Alert(
