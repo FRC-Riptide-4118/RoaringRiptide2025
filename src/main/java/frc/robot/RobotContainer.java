@@ -65,6 +65,9 @@ public class RobotContainer {
     switch (Constants.currentMode) {
       case REAL:
         // Real robot, instantiate hardware IO implementations
+
+        // If using REV hardware, set up the Spark Odometry Thread, if using CTRE hardware, set up
+        // the Phoenix Odometry Thread, if using a combination of the two, set up both
         drive =
             new Drive(
                 new GyroIOPigeon2(0, "Drive"),
@@ -94,7 +97,8 @@ public class RobotContainer {
                     new AzimuthMotorIOTalonFX(
                         "BackRightAz", AzimuthMotorConstants.BACK_RIGHT_CONFIG),
                     AzimuthMotorConstants.BACK_RIGHT_GAINS),
-                PhoenixOdometryThread.getInstance());
+                PhoenixOdometryThread.getInstance(),
+                null);
         vision =
             new Vision(
                 drive::addVisionMeasurement,
@@ -132,8 +136,8 @@ public class RobotContainer {
                     DriveMotorConstants.BACK_RIGHT_GAINS,
                     new AzimuthMotorIOSim("BackRightAz", AzimuthMotorConstants.BACK_RIGHT_CONFIG),
                     AzimuthMotorConstants.BACK_RIGHT_GAINS),
+                null,
                 null);
-        ;
 
         vision =
             new Vision(
@@ -177,6 +181,7 @@ public class RobotContainer {
                     DriveMotorConstants.BACK_RIGHT_GAINS,
                     new AzimuthMotorIOReplay("BackRightAz"),
                     AzimuthMotorConstants.BACK_RIGHT_GAINS),
+                null,
                 null);
         vision = new Vision(drive::addVisionMeasurement, new VisionIO() {}, new VisionIO() {});
 
