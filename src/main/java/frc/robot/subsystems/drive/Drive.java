@@ -34,6 +34,10 @@ import frc.robot.subsystems.drive.gyro.GyroIO;
 import frc.robot.subsystems.drive.gyro.GyroIOInputsAutoLogged;
 import frc.robot.subsystems.drive.odometry_threads.PhoenixOdometryThread;
 import frc.robot.subsystems.drive.odometry_threads.SparkOdometryThread;
+import frc.robot.util.mechanical_advantage.LoggedTunableNumber;
+import frc.robot.util.mechanical_advantage.swerve.ModuleLimits;
+import frc.robot.util.mechanical_advantage.swerve.SwerveSetpoint;
+import frc.robot.util.mechanical_advantage.swerve.SwerveSetpointGenerator;
 import frc.robot.util.pathplanner.AdvancedPPHolonomicDriveController;
 import frc.robot.util.pathplanner.LocalADStarAK;
 import java.util.concurrent.locks.Lock;
@@ -62,6 +66,24 @@ public class Drive extends SubsystemBase {
   private SwerveDrivePoseEstimator poseEstimator =
       new SwerveDrivePoseEstimator(kinematics, rawGyroRotation, lastModulePositions, new Pose2d());
 
+  private final SwerveSetpointGenerator setpointGenerator;
+  private ModuleLimits currentModuleLimits = new ModuleLimits(10, 10, 10, 10);
+  private SwerveSetpoint currentSetpoint =
+      new SwerveSetpoint(
+          new ChassisSpeeds(),
+          new SwerveModuleState[] {
+            new SwerveModuleState(),
+            new SwerveModuleState(),
+            new SwerveModuleState(),
+            new SwerveModuleState()
+          },
+          new double[4]);
+
+  private final LoggedTunableNumber kMaxDriveVelocity;
+  private final LoggedTunableNumber kMaxDriveAcceleration;
+  private final LoggedTunableNumber kMaxDriveDeceleration;
+  private final LoggedTunableNumber kMaxSteeringVelocity;
+
   public Drive(
       GyroIO gyroIO,
       Module flModule,
@@ -76,16 +98,30 @@ public class Drive extends SubsystemBase {
     modules[2] = blModuleIO;
     modules[3] = brModuleIO;
 
+    setpointGenerator =
+        new SwerveSetpointGenerator(
+            kinematics,
+            DriveConstants.moduleTranslations[0],
+            DriveConstants.moduleTranslations[1],
+            DriveConstants.moduleTranslations[2],
+            DriveConstants.moduleTranslations[3]);
+
+    kMaxDriveVelocity = new LoggedTunableNumber("Drive/ModuleLimits/kMaxDriveVelocity", 10);
+    kMaxDriveAcceleration = new LoggedTunableNumber("Drive/ModuleLimits/kMaxDriveAcceleration", 10);
+    kMaxDriveDeceleration = new LoggedTunableNumber("Drive/ModuleLimits/kMaxDriveDeceleration", 10);
+    kMaxSteeringVelocity = new LoggedTunableNumber("Drive/ModuleLimits/kMaxSteeringVelocity", 10);
+
     // Usage reporting for swerve template
     HAL.report(tResourceType.kResourceType_RobotDrive, tInstances.kRobotDriveSwerve_AdvantageKit);
 
-    // Start odometry thread
-    if (sparkOdometryThread != null) {
-      sparkOdometryThread.start();
-    }
-
+    // Start phoenix odometry thread
     if (phoenixOdometryThread != null) {
       phoenixOdometryThread.start();
+    }
+
+    // Start spark odometry thread
+    if (sparkOdometryThread != null) {
+      sparkOdometryThread.start();
     }
 
     // Configure AutoBuilder for PathPlanner
@@ -168,7 +204,6 @@ public class Drive extends SubsystemBase {
         // Use the real gyro angle
         try {
           rawGyroRotation = gyroInputs.odometryYawPositions[i];
-
         } catch (Exception e) {
 
         }
@@ -184,6 +219,16 @@ public class Drive extends SubsystemBase {
 
     // Update gyro alert
     gyroDisconnectedAlert.set(!gyroInputs.connected && Constants.currentMode != Mode.SIM);
+
+    LoggedTunableNumber.ifChanged(
+        hashCode(),
+        (values) -> {
+          currentModuleLimits = new ModuleLimits(values[0], values[1], values[2], values[3]);
+        },
+        kMaxDriveVelocity,
+        kMaxDriveAcceleration,
+        kMaxDriveDeceleration,
+        kMaxSteeringVelocity);
   }
 
   /**
@@ -192,23 +237,23 @@ public class Drive extends SubsystemBase {
    * @param speeds Speeds in meters/sec
    */
   public void runVelocity(ChassisSpeeds speeds) {
-    // Calculate module setpointsS
-    speeds = ChassisSpeeds.discretize(speeds, 0.02);
-
-    SwerveModuleState[] setpointStates = kinematics.toSwerveModuleStates(speeds);
-    SwerveDriveKinematics.desaturateWheelSpeeds(setpointStates, DriveConstants.maxSpeedAt12Volts);
-
+    currentSetpoint =
+        setpointGenerator.generateSetpoint(
+            currentModuleLimits, currentSetpoint, speeds, new Translation2d(), 0.02);
     // Log unoptimized setpoints and setpoint speeds
-    Logger.recordOutput("SwerveStates/Setpoints", setpointStates);
+    Logger.recordOutput("SwerveStates/Setpoints", currentSetpoint.moduleStates());
     Logger.recordOutput("SwerveChassisSpeeds/Setpoints", speeds);
+
+    Logger.recordOutput("SwerveStates/AzimuthVelocityFF", currentSetpoint.azimuthVelocityFF());
 
     // Send setpoints to modules
     for (int i = 0; i < 4; i++) {
-      modules[i].runSetpoint(setpointStates[i]);
+      modules[i].runSetpoint(
+          currentSetpoint.moduleStates()[i], currentSetpoint.azimuthVelocityFF()[i]);
     }
 
     // Log optimized setpoints (runSetpoint mutates each state)
-    Logger.recordOutput("SwerveStates/SetpointsOptimized", setpointStates);
+    Logger.recordOutput("SwerveStates/SetpointsOptimized", currentSetpoint.moduleStates());
   }
 
   /** Runs the drive in a straight line with the specified drive output. */

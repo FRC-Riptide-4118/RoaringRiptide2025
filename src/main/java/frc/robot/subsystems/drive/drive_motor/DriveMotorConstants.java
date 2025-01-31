@@ -5,7 +5,8 @@ import frc.robot.subsystems.drive.DriveConstants;
 public class DriveMotorConstants {
   public static final String canBusName = "";
 
-  public record DriveMotorGains(double kP, double kI, double kD, double kS, double kV, double kA) {}
+  public record DriveMotorGains(
+      double kP, double kI, double kD, double kS, double kV, double kA, double kMaxAccel) {}
 
   public record DriveMotorHardwareConfig(
       int[] canIds, boolean[] reversed, double gearRatio, String canBus) {}
@@ -27,14 +28,14 @@ public class DriveMotorConstants {
           new int[] {34}, new boolean[] {true}, DriveConstants.driveMotorGearRatio, canBusName);
 
   public static final DriveMotorGains FRONT_LEFT_GAINS =
-      new DriveMotorGains(0.005, 0.0, 0.0, 0.114, 0.0665, 0);
+      new DriveMotorGains(0.005, 0.0, 0.0, 0.114, 0.0665, 0, 0);
 
   public static final DriveMotorGains FRONT_RIGHT_GAINS =
-      new DriveMotorGains(0.005, 0.0, 0.0, 0.114, 0.0665, 0);
+      new DriveMotorGains(0.005, 0.0, 0.0, 0.114, 0.0665, 0, 0);
 
   public static final DriveMotorGains BACK_LEFT_GAINS =
-      new DriveMotorGains(0.005, 0.0, 0.0, 0.114, 0.0665, 0);
+      new DriveMotorGains(0.005, 0.0, 0.0, 0.114, 0.0665, 0, 0);
 
   public static final DriveMotorGains BACK_RIGHT_GAINS =
-      new DriveMotorGains(0.005, 0.0, 0.0, 0.114, 0.0665, 0);
+      new DriveMotorGains(0.005, 0.0, 0.0, 0.114, 0.0665, 0, 0);
 }
