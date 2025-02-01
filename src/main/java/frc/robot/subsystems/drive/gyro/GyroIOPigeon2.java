@@ -9,6 +9,7 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
+import edu.wpi.first.units.measure.LinearAcceleration;
 import frc.robot.subsystems.drive.DriveConstants;
 import frc.robot.subsystems.drive.odometry_threads.PhoenixOdometryThread;
 import java.util.Queue;
@@ -21,6 +22,9 @@ public class GyroIOPigeon2 implements GyroIO {
   private final Queue<Double> yawTimestampQueue;
   private final StatusSignal<AngularVelocity> yawVelocity;
 
+  private final StatusSignal<LinearAcceleration> accelX;
+  private final StatusSignal<LinearAcceleration> accelY;
+
   public GyroIOPigeon2(int canID, String canBusName) {
     pigeon = new Pigeon2(canID, canBusName);
     pigeon.getConfigurator().apply(new Pigeon2Configuration());
@@ -32,6 +36,9 @@ public class GyroIOPigeon2 implements GyroIO {
     yawVelocity = pigeon.getAngularVelocityZWorld();
     yawVelocity.setUpdateFrequency(50.0);
 
+    accelX = pigeon.getAccelerationX();
+    accelY = pigeon.getAccelerationY();
+
     pigeon.optimizeBusUtilization();
 
     yawTimestampQueue = PhoenixOdometryThread.getInstance().makeTimestampQueue();
@@ -40,9 +47,13 @@ public class GyroIOPigeon2 implements GyroIO {
 
   @Override
   public void updateInputs(GyroIOInputs inputs) {
-    inputs.connected = BaseStatusSignal.refreshAll(yaw, yawVelocity).equals(StatusCode.OK);
+    inputs.connected =
+        BaseStatusSignal.refreshAll(yaw, yawVelocity, accelX, accelY).equals(StatusCode.OK);
     inputs.yawPosition = Rotation2d.fromDegrees(yaw.getValueAsDouble());
     inputs.yawVelocityRadPerSec = Units.degreesToRadians(yawVelocity.getValueAsDouble());
+
+    inputs.accelX = accelX.getValueAsDouble();
+    inputs.accelY = accelY.getValueAsDouble();
 
     inputs.odometryYawTimestamps =
         yawTimestampQueue.stream().mapToDouble((Double value) -> value).toArray();

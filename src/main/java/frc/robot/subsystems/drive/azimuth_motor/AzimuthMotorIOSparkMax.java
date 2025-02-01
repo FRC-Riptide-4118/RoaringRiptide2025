@@ -104,7 +104,8 @@ public class AzimuthMotorIOSparkMax implements AzimuthMotorIO {
                     .withMagnetSensor(
                         new MagnetSensorConfigs()
                             .withSensorDirection(SensorDirectionValue.CounterClockwise_Positive)
-                            .withMagnetOffset(config.encoderOffset().getRotations())));
+                            .withMagnetOffset(config.encoderOffset().getRotations())
+                            .withAbsoluteSensorDiscontinuityPoint(1)));
 
         encoderAlert =
             new Alert(
@@ -112,9 +113,12 @@ public class AzimuthMotorIOSparkMax implements AzimuthMotorIO {
                 name + " CANCoder Disconnected! CAN ID: " + config.encoderID(),
                 AlertType.kError);
 
+        double absolutePosition = externalEncoder.getAbsoluteAngle().getRotations();
         motors[0].configure(
             leaderConfig, ResetMode.kNoResetSafeParameters, PersistMode.kNoPersistParameters);
-        motors[0].getEncoder().setPosition(externalEncoder.getAbsoluteAngle().getRotations());
+        motors[0].getEncoder().setPosition(absolutePosition);
+        double position = motors[0].getEncoder().getPosition();
+        System.out.println(position);
         break;
       case EXTERNAL_CANCODER_PRO:
         throw new IllegalArgumentException("EXTERNAL_CANCODER_PRO not supported on SparkMax");
@@ -200,7 +204,7 @@ public class AzimuthMotorIOSparkMax implements AzimuthMotorIO {
     currentPosition = motors[0].getEncoder().getPosition();
 
     inputs.outputPositionRotations = currentPosition;
-    inputs.rotorPositionRotations = currentPosition * hardwareConfig.gearRatio();
+    inputs.rotorPositionRotations = externalEncoder.getAbsoluteAngle().getRotations();
     inputs.desiredPositionRotations = positionSetpoint;
 
     inputs.velocityRotationsPerSecond = motors[0].getEncoder().getVelocity();
