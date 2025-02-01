@@ -22,8 +22,7 @@ import frc.robot.subsystems.drive.drive_motor.DriveMotorIOReplay;
 import frc.robot.subsystems.drive.drive_motor.DriveMotorIOSim;
 import frc.robot.subsystems.drive.drive_motor.DriveMotorIOSparkMax;
 import frc.robot.subsystems.drive.gyro.GyroIO;
-import frc.robot.subsystems.drive.gyro.GyroIOPigeon2;
-import frc.robot.subsystems.drive.odometry_threads.PhoenixOdometryThread;
+import frc.robot.subsystems.drive.gyro.GyroIOPigeon2SparkThread;
 import frc.robot.subsystems.drive.odometry_threads.SparkOdometryThread;
 import frc.robot.subsystems.vision.Vision;
 import frc.robot.subsystems.vision.VisionConstants;
@@ -65,7 +64,7 @@ public class RobotContainer {
         // the Phoenix Odometry Thread, if using a combination of the two, set up both
         drive =
             new Drive(
-                new GyroIOPigeon2(0, ""),
+                new GyroIOPigeon2SparkThread(0),
                 new Module(
                     new DriveMotorIOSparkMax(
                         "FrontLeftDrive", DriveMotorConstants.FRONT_LEFT_CONFIG),
@@ -93,7 +92,7 @@ public class RobotContainer {
                     new AzimuthMotorIOSparkMax(
                         "BackRightAz", AzimuthMotorConstants.BACK_RIGHT_CONFIG),
                     AzimuthMotorConstants.BACK_RIGHT_GAINS),
-                PhoenixOdometryThread.getInstance(),
+                null,
                 SparkOdometryThread.getInstance());
         vision =
             new Vision(
