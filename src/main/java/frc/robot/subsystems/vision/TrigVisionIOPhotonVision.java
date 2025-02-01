@@ -9,22 +9,26 @@ import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
+import java.util.function.Supplier;
 import org.photonvision.PhotonCamera;
 
 /** IO implementation for real PhotonVision hardware. */
 public class TrigVisionIOPhotonVision implements VisionIO {
   protected final PhotonCamera camera;
   protected final Transform3d robotToCamera;
-
+  protected final Supplier<Rotation2d> gyroRotationSupplier;
   /**
    * Creates a new VisionIOPhotonVision.
    *
    * @param name The configured name of the camera.
    * @param rotationSupplier The 3D position of the camera relative to the robot.
    */
-  public TrigVisionIOPhotonVision(String name, Transform3d robotToCamera) {
+  public TrigVisionIOPhotonVision(
+      String name, Transform3d robotToCamera, Supplier<Rotation2d> gyroRotation) {
     camera = new PhotonCamera(name);
     this.robotToCamera = robotToCamera;
+
+    gyroRotationSupplier = gyroRotation;
   }
 
   @Override
@@ -45,43 +49,61 @@ public class TrigVisionIOPhotonVision implements VisionIO {
             new TargetObservation(
                 Rotation2d.fromDegrees(result.getBestTarget().getYaw()),
                 Rotation2d.fromDegrees(result.getBestTarget().getPitch()));
+
+        Transform3d bestFieldToCamera = result.getBestTarget().getBestCameraToTarget();
+        // Transform3d bestFieldToRobot = bestFieldToCamera.plus(robotToCamera.inverse());
+
+        Transform3d worstFieldToCamera = result.getBestTarget().getAlternateCameraToTarget();
+        // Transform3d worstFieldToRobot = worstFieldToCamera.plus(robotToCamera.inverse());
+
+        double bestDistance = bestFieldToCamera.getTranslation().getNorm();
+        double worstDistance = worstFieldToCamera.getTranslation().getNorm();
+
+        bestDistances.add(bestDistance);
+        worstDistances.add(worstDistance);
+
+        Transform3d fieldToCameraTrig =
+            new Transform3d(
+                new Translation3d(
+                    bestDistance
+                        * Math.cos(
+                            Math.toRadians(
+                                result.getBestTarget().getYaw()
+                                    - gyroRotationSupplier.get().getDegrees())),
+                    -bestDistance
+                        * Math.sin(
+                            Math.toRadians(
+                                result.getBestTarget().getYaw()
+                                    - gyroRotationSupplier.get().getDegrees())),
+                    bestDistance * Math.sin(Math.toRadians(result.getBestTarget().getPitch()))),
+                new Rotation3d(gyroRotationSupplier.get()));
+
+        Transform3d fieldToRobot = fieldToCameraTrig.plus(robotToCamera.inverse());
+
+        inputs.robotToTagTransform =
+            new TransformTag(fieldToRobot, result.getBestTarget().fiducialId);
+
+        Pose3d robotPose =
+            VisionConstants.aprilTagLayout
+                .getTagPose(result.getBestTarget().fiducialId)
+                .get()
+                .plus(fieldToRobot);
+
+        tagIds.add(result.getBestTarget().fiducialId);
+
+        poseObservations.add(
+            new PoseObservation(
+                result.getTimestampSeconds(),
+                robotPose,
+                result.getBestTarget().getPoseAmbiguity(),
+                1,
+                bestDistance,
+                PoseObservationType.PHOTONVISION));
       } else {
         inputs.latestTargetObservation = new TargetObservation(new Rotation2d(), new Rotation2d());
+
+        inputs.robotToTagTransform = new TransformTag(new Transform3d(), 0);
       }
-
-      Transform3d bestFieldToCamera = result.getBestTarget().getBestCameraToTarget();
-      // Transform3d bestFieldToRobot = bestFieldToCamera.plus(robotToCamera.inverse());
-
-      Transform3d worstFieldToCamera = result.getBestTarget().getAlternateCameraToTarget();
-      // Transform3d worstFieldToRobot = worstFieldToCamera.plus(robotToCamera.inverse());
-
-      double bestDistance = bestFieldToCamera.getTranslation().getNorm();
-      double worstDistance = worstFieldToCamera.getTranslation().getNorm();
-
-      bestDistances.add(bestDistance);
-      worstDistances.add(worstDistance);
-
-      Transform3d fieldToCameraTrig =
-          new Transform3d(
-              new Translation3d(
-                  bestDistance * Math.cos(Math.toRadians(result.getBestTarget().getYaw())),
-                  bestDistance * Math.sin(Math.toRadians(result.getBestTarget().getYaw())),
-                  bestDistance * Math.sin(Math.toRadians(result.getBestTarget().getPitch()))),
-              new Rotation3d());
-
-      Transform3d fieldToRobot = fieldToCameraTrig.plus(robotToCamera.inverse());
-      Pose3d robotPose = new Pose3d(fieldToRobot.getTranslation(), fieldToRobot.getRotation());
-
-      tagIds.add(result.getBestTarget().fiducialId);
-
-      poseObservations.add(
-          new PoseObservation(
-              result.getTimestampSeconds(),
-              robotPose,
-              result.getBestTarget().getPoseAmbiguity(),
-              1,
-              bestDistance,
-              PoseObservationType.PHOTONVISION));
     }
 
     // Save pose observations to inputs object

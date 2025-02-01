@@ -255,7 +255,7 @@ public class AzimuthMotorIOSparkMax implements AzimuthMotorIO {
         timestampQueue.stream().mapToDouble((Double value) -> value).toArray();
     inputs.odometryTurnPositions =
         turnPositionQueue.stream()
-            .map((Double value) -> new Rotation2d(value))
+            .map((Double value) -> Rotation2d.fromRotations(value))
             .toArray(Rotation2d[]::new);
     timestampQueue.clear();
     turnPositionQueue.clear();

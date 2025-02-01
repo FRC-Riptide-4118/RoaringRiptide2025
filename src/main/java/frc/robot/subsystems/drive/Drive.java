@@ -202,11 +202,8 @@ public class Drive extends SubsystemBase {
       // Update gyro angle
       if (gyroInputs.connected) {
         // Use the real gyro angle
-        try {
-          rawGyroRotation = gyroInputs.odometryYawPositions[i];
-        } catch (Exception e) {
+        rawGyroRotation = gyroInputs.odometryYawPositions[i];
 
-        }
       } else {
         // Use the angle delta from the kinematics and module deltas
         Twist2d twist = kinematics.toTwist2d(moduleDeltas);
@@ -347,6 +344,9 @@ public class Drive extends SubsystemBase {
     return getPose().getRotation();
   }
 
+  public Rotation2d getGyroRotation() {
+    return gyroInputs.yawPosition;
+  }
   /** Resets the current odometry pose. */
   public void setPose(Pose2d pose) {
     poseEstimator.resetPosition(rawGyroRotation, getModulePositions(), pose);

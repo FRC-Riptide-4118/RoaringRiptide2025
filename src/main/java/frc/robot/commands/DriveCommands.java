@@ -17,6 +17,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.drive.DriveConstants;
+import frc.robot.subsystems.vision.Vision;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.LinkedList;
@@ -26,8 +27,8 @@ import java.util.function.Supplier;
 
 public class DriveCommands {
   private static final double DEADBAND = 0.1;
-  private static final double ANGLE_KP = 5.0;
-  private static final double ANGLE_KD = 0.4;
+  private static final double ANGLE_KP = 3.0;
+  private static final double ANGLE_KD = 0.2;
   private static final double ANGLE_MAX_VELOCITY = 8.0;
   private static final double ANGLE_MAX_ACCELERATION = 20.0;
   private static final double FF_START_DELAY = 2.0; // Secs
@@ -92,6 +93,53 @@ public class DriveCommands {
   }
 
   /**
+   * Field relative drive command using two joysticks (controlling linear and angular velocities).
+   */
+  public static Command joystickDriveReef(
+      Drive drive,
+      Vision vision,
+      DoubleSupplier xSupplier,
+      DoubleSupplier ySupplier,
+      DoubleSupplier omegaSupplier) {
+    return Commands.run(
+        () -> {
+          // Get linear velocity
+          Translation2d linearVelocity =
+              getLinearVelocityFromJoysticks(xSupplier.getAsDouble(), ySupplier.getAsDouble());
+
+          // Apply rotation deadband
+          double omega = MathUtil.applyDeadband(omegaSupplier.getAsDouble(), DEADBAND);
+
+          // Square rotation value for more precise control
+          omega = Math.copySign(omega * omega, omega);
+
+          // Convert to field relative speeds & send command
+          ChassisSpeeds speeds =
+              new ChassisSpeeds(
+                  linearVelocity.getX() * drive.getMaxLinearSpeedMetersPerSec(),
+                  linearVelocity.getY() * drive.getMaxLinearSpeedMetersPerSec(),
+                  omega * drive.getMaxAngularSpeedRadPerSec());
+          boolean isFlipped =
+              DriverStation.getAlliance().isPresent()
+                  && DriverStation.getAlliance().get() == Alliance.Red;
+          speeds =
+              ChassisSpeeds.fromFieldRelativeSpeeds(
+                  speeds,
+                  isFlipped
+                      ? drive.getRotation().plus(new Rotation2d(Math.PI))
+                      : drive.getRotation());
+          // if (vision.getRobotToTagTransform().tagID() != 0) {
+          if (speeds.vxMetersPerSecond > 0.1) {
+            speeds.vyMetersPerSecond = 3 * vision.getRobotToTagTransform().robotToTag().getY();
+          }
+          // }
+
+          drive.runVelocity(speeds);
+        },
+        drive);
+  }
+
+  /**
    * Field relative drive command using joystick for linear control and PID for angular control.
    * Possible use cases include snapping to an angle, aiming at a vision target, or controlling
    * absolute rotation with a joystick.
@@ -146,6 +194,87 @@ public class DriveCommands {
         .beforeStarting(() -> angleController.reset(drive.getRotation().getRadians()));
   }
 
+  public static Command joystickDriveAtAngleReef(
+      Drive drive,
+      Vision vision,
+      DoubleSupplier xSupplier,
+      DoubleSupplier ySupplier,
+      DoubleSupplier omegaSupplier) {
+
+    // Create PID controller
+    ProfiledPIDController angleController =
+        new ProfiledPIDController(
+            ANGLE_KP,
+            0.0,
+            ANGLE_KD,
+            new TrapezoidProfile.Constraints(ANGLE_MAX_VELOCITY, ANGLE_MAX_ACCELERATION));
+    angleController.enableContinuousInput(-Math.PI, Math.PI);
+
+    // Construct command
+    return Commands.run(
+            () -> {
+              // Get linear velocity
+              Translation2d linearVelocity =
+                  getLinearVelocityFromJoysticks(xSupplier.getAsDouble(), ySupplier.getAsDouble());
+              double omega;
+              if (Math.abs(omegaSupplier.getAsDouble()) < 0.1) {
+                switch (vision.getRobotToTagTransform().tagID()) {
+                  case 6:
+                    omega =
+                        angleController.calculate(
+                            drive.getRotation().getRadians(), Math.toRadians(-60));
+                    break;
+
+                  case 7:
+                    omega =
+                        angleController.calculate(
+                            drive.getRotation().getRadians(), Math.toRadians(180));
+                    break;
+                  default:
+                    omega = omegaSupplier.getAsDouble() * drive.getMaxAngularSpeedRadPerSec();
+                    break;
+                }
+              } else {
+                omega = omegaSupplier.getAsDouble();
+              }
+
+              // Calculate angular speed
+              // double omega = angleController.calculate(drive.getRotation().getRadians(),
+              // rotation);
+
+              // Convert to field relative speeds & send command
+              ChassisSpeeds speeds =
+                  new ChassisSpeeds(
+                      linearVelocity.getX() * drive.getMaxLinearSpeedMetersPerSec(),
+                      linearVelocity.getY() * drive.getMaxLinearSpeedMetersPerSec(),
+                      omega);
+              boolean isFlipped =
+                  DriverStation.getAlliance().isPresent()
+                      && DriverStation.getAlliance().get() == Alliance.Red;
+              speeds =
+                  ChassisSpeeds.fromFieldRelativeSpeeds(
+                      speeds,
+                      isFlipped
+                          ? drive.getRotation().plus(new Rotation2d(Math.PI))
+                          : drive.getRotation());
+
+              if (Math.abs(speeds.vyMetersPerSecond) < 0.5) {
+                if (Math.abs(vision.getRobotToTagTransform().robotToTag().getY()) > 0.05) {
+                  speeds.vyMetersPerSecond =
+                      2
+                          * speeds.vxMetersPerSecond
+                          * vision.getRobotToTagTransform().robotToTag().getY();
+                } else {
+                  speeds.vyMetersPerSecond = 0.0;
+                }
+              }
+              drive.runVelocity(speeds);
+            },
+            drive)
+
+        // Reset PID controller when command starts
+        .beforeStarting(() -> angleController.reset(drive.getRotation().getRadians()));
+  }
   /**
    * Measures the velocity feedforward constants for the drive motors.
    *

@@ -2,6 +2,7 @@ package frc.robot.subsystems.vision;
 
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Transform3d;
 import org.littletonrobotics.junction.AutoLog;
 
 public interface VisionIO {
@@ -15,7 +16,11 @@ public interface VisionIO {
 
     public double[] bestDistance = new double[0];
     public double[] worstDistance = new double[0];
+
+    public TransformTag robotToTagTransform = new TransformTag(new Transform3d(), 0);
   }
+
+  public record TransformTag(Transform3d robotToTag, int tagID) {}
 
   /** Represents the angle to a simple target, not used for pose estimation. */
   public static record TargetObservation(Rotation2d tx, Rotation2d ty) {}

@@ -93,10 +93,12 @@ public class DriveMotorIOSparkMax implements DriveMotorIO {
               AlertType.kError);
     }
 
+    motors[0].getEncoder().setPosition(0);
+
     timestampQueue = SparkOdometryThread.getInstance().makeTimestampQueue();
     drivePositionQueue =
         SparkOdometryThread.getInstance()
-            .registerSignal(motors[0], motors[0].getEncoder()::getPosition);
+            .registerSignal(motors[0], () -> (motors[0].getEncoder().getPosition() * 2 * Math.PI));
   }
 
   @Override
