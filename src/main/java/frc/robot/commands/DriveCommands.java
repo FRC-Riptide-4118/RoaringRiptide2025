@@ -284,7 +284,7 @@ public class DriveCommands {
   public static Command driveToReef() {
     try {
       return AutoBuilder.pathfindThenFollowPath(
-          PathPlannerPath.fromPathFile("DriveToB"), DriveConstants.ppConstraints);
+          PathPlannerPath.fromPathFile("DriveToA"), DriveConstants.ppConstraints);
     } catch (FileVersionException | IOException | ParseException e) {
       return Commands.none();
     }

@@ -100,7 +100,7 @@ public class RobotContainer {
                 new TrigVisionIOPhotonVision(
                     VisionConstants.camera0Name,
                     VisionConstants.robotToCamera0,
-                    drive::getRotation));
+                    drive::getGyroRotation));
         // positionJoint =
         //     new PositionJoint(
         //         new PositionJointIOSparkMax(
@@ -243,7 +243,7 @@ public class RobotContainer {
     // Switch to X pattern when X button is pressed
     driverController.x().onTrue(Commands.runOnce(drive::stopWithX, drive));
 
-    driverController.y().onTrue(DriveCommands.driveToReef());
+    driverController.y().whileTrue(DriveCommands.driveToReef());
     // // Reset gyro / odometry
     final Runnable resetGyro =
         () ->

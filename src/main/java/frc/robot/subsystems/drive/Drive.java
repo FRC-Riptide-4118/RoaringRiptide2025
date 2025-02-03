@@ -84,6 +84,8 @@ public class Drive extends SubsystemBase {
   private final LoggedTunableNumber kMaxDriveDeceleration;
   private final LoggedTunableNumber kMaxSteeringVelocity;
 
+  private Rotation2d headingOffset = new Rotation2d();
+
   public Drive(
       GyroIO gyroIO,
       Module flModule,
@@ -345,11 +347,13 @@ public class Drive extends SubsystemBase {
   }
 
   public Rotation2d getGyroRotation() {
-    return gyroInputs.yawPosition;
+    return rawGyroRotation.minus(headingOffset);
   }
   /** Resets the current odometry pose. */
   public void setPose(Pose2d pose) {
     poseEstimator.resetPosition(rawGyroRotation, getModulePositions(), pose);
+
+    headingOffset = rawGyroRotation;
   }
 
   /** Adds a new timestamped vision measurement. */
