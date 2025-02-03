@@ -1,5 +1,8 @@
 package frc.robot.commands;
 
+import com.pathplanner.lib.auto.AutoBuilder;
+import com.pathplanner.lib.path.PathPlannerPath;
+import com.pathplanner.lib.util.FileVersionException;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.filter.SlewRateLimiter;
@@ -18,12 +21,14 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.drive.DriveConstants;
 import frc.robot.subsystems.vision.Vision;
+import java.io.IOException;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
+import org.json.simple.parser.ParseException;
 
 public class DriveCommands {
   private static final double DEADBAND = 0.1;
@@ -274,6 +279,15 @@ public class DriveCommands {
 
         // Reset PID controller when command starts
         .beforeStarting(() -> angleController.reset(drive.getRotation().getRadians()));
+  }
+
+  public static Command driveToReef() {
+    try {
+      return AutoBuilder.pathfindThenFollowPath(
+          PathPlannerPath.fromPathFile("DriveToB"), DriveConstants.ppConstraints);
+    } catch (FileVersionException | IOException | ParseException e) {
+      return Commands.none();
+    }
   }
   /**
    * Measures the velocity feedforward constants for the drive motors.

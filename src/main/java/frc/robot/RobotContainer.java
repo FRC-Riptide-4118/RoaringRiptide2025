@@ -223,9 +223,9 @@ public class RobotContainer {
   private void configureButtonBindings() {
     // Default command, normal field-relative drive
     drive.setDefaultCommand(
-        DriveCommands.joystickDriveAtAngleReef(
+        DriveCommands.joystickDrive(
             drive,
-            vision,
+            // vision,
             () -> -driverController.getLeftY(),
             () -> -driverController.getLeftX(),
             () -> -driverController.getRightX()));
@@ -243,6 +243,7 @@ public class RobotContainer {
     // Switch to X pattern when X button is pressed
     driverController.x().onTrue(Commands.runOnce(drive::stopWithX, drive));
 
+    driverController.y().onTrue(DriveCommands.driveToReef());
     // // Reset gyro / odometry
     final Runnable resetGyro =
         () ->
