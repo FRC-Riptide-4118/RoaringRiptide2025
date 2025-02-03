@@ -1,7 +1,6 @@
 package frc.robot.subsystems.simulation;
 
 import edu.wpi.first.wpilibj.AnalogPotentiometer;
-import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.motorcontrol.PWMSparkMax;
 import edu.wpi.first.wpilibj.smartdashboard.Mechanism2d;
@@ -21,7 +20,6 @@ public class SimulationViewer extends SubsystemBase {
   private final MechanismLigament2d m_elevator;
   private final MechanismLigament2d m_wrist;
   private final DoubleSupplier doubleSupplier;
-  private final Encoder m_elevatorEncoder = new Encoder(0, 1);
   private final AnalogPotentiometer m_wristPot = new AnalogPotentiometer(1, 90);
   private final Joystick m_joystick = new Joystick(0);
 
@@ -45,8 +43,9 @@ public class SimulationViewer extends SubsystemBase {
 
   @Override
   public void periodic() {
-    // if there are bugs, change this to robot periodic
-    m_elevator.setLength(kElevatorMinimumLength + m_elevatorEncoder.getDistance());
+    // if there are bugs, change this to robot periodic'
+    double elevatorPosition = doubleSupplier.getAsDouble();
+    m_elevator.setLength(kElevatorMinimumLength + elevatorPosition);
     m_wrist.setAngle(m_wristPot.get());
 
     // if there are bugs, change this to teleop periodic
