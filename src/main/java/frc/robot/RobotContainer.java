@@ -100,7 +100,7 @@ public class RobotContainer {
                 new TrigVisionIOPhotonVision(
                     VisionConstants.camera0Name,
                     VisionConstants.robotToCamera0,
-                    drive::getGyroRotation));
+                    drive::getRotation));
         // positionJoint =
         //     new PositionJoint(
         //         new PositionJointIOSparkMax(
