@@ -46,27 +46,12 @@ public class PositionJointConstants {
       Rotation2d encoderOffset,
       String canBus) {}
 
-  public static final PositionJointGains EXAMPLE_GAINS =
-      new PositionJointGains(1.5, 0.0, 0.0, 0.5, 1.0, 2.0, 0.0, 10.0, 20.0, 0.0, Math.PI, 0.2, 0.0);
-
-  public static final PositionJointHardwareConfig EXAMPLE_CONFIG =
-      new PositionJointHardwareConfig(
-          new int[] {10},
-          new boolean[] {true},
-          85.33333 * 2 * Math.PI,
-          40,
-          GravityType.COSINE,
-          EncoderType.EXTERNAL_CANCODER,
-          11,
-          Rotation2d.fromRotations(0.5),
-          "");
-
-  public static final PositionJointGains POSITION_JOINT_GAINS =
+  public static final PositionJointGains ELEVATOR_GAINS =
       new PositionJointGains(0.05, 0.00001, 0, 0.112, 0, 0.115, 0.008, 20, 30, 0, 100, 0, 0);
 
-  public static final PositionJointHardwareConfig POSITION_JOINT_CONFIG =
+  public static final PositionJointHardwareConfig ELEVATOR_CONFIG =
       new PositionJointHardwareConfig(
-          new int[] {20, 21},
+          new int[] {19, 20},
           new boolean[] {false, true},
           1.0 / 1.0,
           15,
@@ -74,5 +59,21 @@ public class PositionJointConstants {
           EncoderType.INTERNAL,
           -1,
           new Rotation2d(),
+          "");
+
+  public static final PositionJointGains WRIST_GAINS =
+      new PositionJointGains(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
+
+  public static final PositionJointHardwareConfig WRIST_CONFIG =
+      new PositionJointHardwareConfig(
+          new int[] {10},
+          new boolean[] {false},
+          // TODO: might have to change gear ratio
+          25.0 / 1.0,
+          40,
+          GravityType.COSINE,
+          EncoderType.EXTERNAL_CANCODER,
+          1,
+          Rotation2d.fromRotations(0),
           "");
 }

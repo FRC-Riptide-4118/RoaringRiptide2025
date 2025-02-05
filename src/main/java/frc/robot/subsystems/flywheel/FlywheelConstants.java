@@ -14,9 +14,15 @@ public class FlywheelConstants {
   public record FlywheelHardwareConfig(
       int[] canIds, boolean[] reversed, double gearRatio, String canBus) {}
 
-  public static final FlywheelHardwareConfig EXAMPLE_CONFIG =
-      new FlywheelHardwareConfig(new int[] {1}, new boolean[] {true}, 2.0, "");
+  public static final FlywheelGains CORAL_INTAKE_GAINS =
+      new FlywheelGains(0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0);
 
-  public static final FlywheelGains EXAMPLE_GAINS =
-      new FlywheelGains(0.2, 0.0, 0.0, 0.0, 0.065, 0.0, 1.0, 1.0);
+  public static final FlywheelHardwareConfig CORAL_INTAKE_CONFIG =
+      new FlywheelHardwareConfig(new int[] {11}, new boolean[] {false}, 25.0 / 1.0, "");
+
+  public static final FlywheelGains ALGAE_INTAKE_GAINS =
+      new FlywheelGains(0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0);
+
+  public static final FlywheelHardwareConfig ALGAE_INTAKE_CONFIG =
+      new FlywheelHardwareConfig(new int[] {12, 13}, new boolean[] {false, true}, 20.0 / 1.0, "");
 }
