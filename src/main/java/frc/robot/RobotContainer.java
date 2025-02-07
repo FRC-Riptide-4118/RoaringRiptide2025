@@ -118,7 +118,8 @@ public class RobotContainer {
                 new TrigVisionIOPhotonVision(
                     VisionConstants.camera0Name,
                     VisionConstants.robotToCamera0,
-                    drive::getGyroRotation));
+                    drive::getRotation));
+
         elevator =
             new PositionJoint(
                 new PositionJointIOSparkMax("Elevator", PositionJointConstants.ELEVATOR_CONFIG),
@@ -140,6 +141,7 @@ public class RobotContainer {
                 FlywheelConstants.ALGAE_INTAKE_GAINS);
 
         simulationViewer = new SimulationViewer(elevator::getPosition);
+
         break;
 
       case SIM:
