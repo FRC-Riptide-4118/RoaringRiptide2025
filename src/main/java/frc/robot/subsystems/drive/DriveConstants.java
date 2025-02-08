@@ -83,7 +83,7 @@ public class DriveConstants {
           moduleTranslations);
 
   public static final PathConstraints ppConstraints =
-      new PathConstraints(2, 1, Math.toRadians(360), Math.toRadians(360), 12, false);
+      new PathConstraints(3, 2, Math.toRadians(360), Math.toRadians(360), 12, false);
 
   public static final DriveTrainSimulationConfig mapleSimConfig =
       DriveTrainSimulationConfig.Default()
