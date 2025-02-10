@@ -1,0 +1,54 @@
+{
+  "version": "2025.0",
+  "waypoints": [
+    {
+      "anchor": {
+        "x": 5.4046022727272724,
+        "y": 6.094105113636363
+      },
+      "prevControl": null,
+      "nextControl": {
+        "x": 4.9995881327064815,
+        "y": 5.400583887181158
+      },
+      "isLocked": false,
+      "linkedName": "JStart"
+    },
+    {
+      "anchor": {
+        "x": 4.9359375,
+        "y": 5.2963778409090905
+      },
+      "prevControl": {
+        "x": 5.376183765803122,
+        "y": 6.07100390299452
+      },
+      "nextControl": null,
+      "isLocked": false,
+      "linkedName": null
+    }
+  ],
+  "rotationTargets": [],
+  "constraintZones": [],
+  "pointTowardsZones": [],
+  "eventMarkers": [],
+  "globalConstraints": {
+    "maxVelocity": 4.0,
+    "maxAcceleration": 3.0,
+    "maxAngularVelocity": 540.0,
+    "maxAngularAcceleration": 720.0,
+    "nominalVoltage": 12.0,
+    "unlimited": false
+  },
+  "goalEndState": {
+    "velocity": 1.0,
+    "rotation": -119.99999999999999
+  },
+  "reversed": false,
+  "folder": "Reef",
+  "idealStartingState": {
+    "velocity": 0,
+    "rotation": -119.99999999999999
+  },
+  "useDefaultConstraints": true
+}

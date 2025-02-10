@@ -9,10 +9,7 @@ package frc.robot;
 
 import edu.wpi.first.math.geometry.*;
 import edu.wpi.first.math.util.Units;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Contains various field dimensions and useful reference points. All units are in meters and poses
@@ -23,6 +20,7 @@ public class FieldConstants {
   public static final double fieldWidth = Units.inchesToMeters(317);
   public static final double startingLineX =
       Units.inchesToMeters(299.438); // Measured from the inside of starting line
+  public static final double algaeDiameter = Units.inchesToMeters(16);
 
   public static class Processor {
     public static final Pose2d centerFace =
@@ -56,6 +54,7 @@ public class FieldConstants {
   }
 
   public static class Reef {
+    public static final double faceLength = Units.inchesToMeters(36.792600);
     public static final Translation2d center =
         new Translation2d(Units.inchesToMeters(176.746), Units.inchesToMeters(158.501));
     public static final double faceToZoneLine =
@@ -139,8 +138,8 @@ public class FieldConstants {
                       Units.degreesToRadians(level.pitch),
                       poseDirection.getRotation().getRadians())));
         }
-        branchPositions.add((face * 2) + 1, fillRight);
-        branchPositions.add((face * 2) + 2, fillLeft);
+        branchPositions.add(fillRight);
+        branchPositions.add(fillLeft);
       }
     }
   }
@@ -156,17 +155,29 @@ public class FieldConstants {
   }
 
   public enum ReefHeight {
-    L4(Units.inchesToMeters(72), -90),
-    L3(Units.inchesToMeters(47.625), -35),
+    L1(Units.inchesToMeters(25.0), 0),
     L2(Units.inchesToMeters(31.875), -35),
-    L1(Units.inchesToMeters(18), 0);
+    L3(Units.inchesToMeters(47.625), -35),
+    L4(Units.inchesToMeters(72), -90);
 
     ReefHeight(double height, double pitch) {
       this.height = height;
       this.pitch = pitch; // in degrees
     }
 
+    public static ReefHeight fromLevel(int level) {
+      return Arrays.stream(values())
+          .filter(height -> height.ordinal() == level)
+          .findFirst()
+          .orElse(L4);
+    }
+
     public final double height;
     public final double pitch;
   }
+
+  public static final double aprilTagWidth = Units.inchesToMeters(6.50);
+  public static final int aprilTagCount = 22;
+
+  public record CoralObjective(int branchId, ReefHeight reefLevel) {}
 }

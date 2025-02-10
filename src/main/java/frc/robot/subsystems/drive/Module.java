@@ -83,10 +83,10 @@ public class Module {
 
   public void periodic() {
     driveMotor.updateInputs(driveInputs);
-    Logger.processInputs(driveName, driveInputs);
+    Logger.processInputs("Drive/" + driveName, driveInputs);
 
     azimuthMotor.updateInputs(azimuthInputs);
-    Logger.processInputs(azimuthName, azimuthInputs);
+    Logger.processInputs("Drive/" + azimuthName, azimuthInputs);
 
     // Calculate positions for odometry
     int sampleCount = driveInputs.odometryTimestamps.length; // All signals are sampled together

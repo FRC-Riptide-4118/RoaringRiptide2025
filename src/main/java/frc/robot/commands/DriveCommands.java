@@ -18,6 +18,7 @@ import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.FunctionalCommand;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.drive.DriveConstants;
 import frc.robot.subsystems.vision.Vision;
@@ -29,6 +30,7 @@ import java.util.List;
 import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
 import org.json.simple.parser.ParseException;
+import org.littletonrobotics.junction.Logger;
 
 public class DriveCommands {
   private static final double DEADBAND = 0.1;
@@ -284,11 +286,125 @@ public class DriveCommands {
   public static Command driveToReef() {
     try {
       return AutoBuilder.pathfindThenFollowPath(
-          PathPlannerPath.fromPathFile("DriveToA"), DriveConstants.ppConstraints);
+          PathPlannerPath.fromPathFile("DriveToA"), AutoDrivePresets.CONSTRAINTS);
     } catch (FileVersionException | IOException | ParseException e) {
-      return Commands.none();
+      // TODO Auto-generated catch block
+      e.printStackTrace();
     }
+    return null;
   }
+
+  /**
+   * @param drive
+   * @return
+   */
+  public static Command joystickDriveAlongTrajectory(
+      Drive drive,
+      PathPlannerPath trajectory,
+      DoubleSupplier xSupplier,
+      DoubleSupplier ySupplier,
+      DoubleSupplier omegaSupplier) {
+    // Get closest point to drivetrain along trajectory
+
+    Pose2d end = trajectory.getPathPoses().get(trajectory.getPathPoses().size() - 1);
+    Rotation2d endRotation = trajectory.getGoalEndState().rotation();
+
+    return new FunctionalCommand(
+        () -> {
+          Logger.recordOutput(
+              "DriveAlongTrajectory/Trajectory", trajectory.getPathPoses().toArray(new Pose2d[0]));
+        },
+        () -> {
+          Pose2d goalState = sampleTrajectory(trajectory, drive.getPose());
+
+          Logger.recordOutput("DriveAlongTrajectory/TrajPose", goalState);
+
+          // Get linear velocity
+          Translation2d linearVelocity =
+              getLinearVelocityFromJoysticks(xSupplier.getAsDouble(), ySupplier.getAsDouble());
+
+          // Apply rotation deadband
+          double omega = MathUtil.applyDeadband(omegaSupplier.getAsDouble(), DEADBAND);
+
+          boolean isFlipped =
+              DriverStation.getAlliance().isPresent()
+                  && DriverStation.getAlliance().get() == Alliance.Red;
+
+          // Square rotation value for more precise control
+          omega = Math.copySign(omega * omega, omega);
+
+          ChassisSpeeds trajectoryVelocity =
+              ChassisSpeeds.fromRobotRelativeSpeeds(1.0, 0.0, 0.0, goalState.getRotation());
+
+          ChassisSpeeds driverVelocity =
+              new ChassisSpeeds(
+                  linearVelocity.getX() * drive.getMaxLinearSpeedMetersPerSec(),
+                  linearVelocity.getY() * drive.getMaxLinearSpeedMetersPerSec(),
+                  omega * drive.getMaxAngularSpeedRadPerSec());
+
+          driverVelocity =
+              ChassisSpeeds.fromFieldRelativeSpeeds(
+                  driverVelocity, isFlipped ? Rotation2d.kPi : Rotation2d.kZero);
+
+          Transform2d Vtraj =
+              new Transform2d(
+                  trajectoryVelocity.vxMetersPerSecond,
+                  trajectoryVelocity.vyMetersPerSecond,
+                  new Rotation2d());
+          Transform2d Vdrive =
+              new Transform2d(
+                  new Translation2d(
+                      driverVelocity.vxMetersPerSecond, driverVelocity.vyMetersPerSecond),
+                  new Rotation2d());
+          Transform2d Vdrive_norm = Vdrive.div(Vdrive.getTranslation().getNorm());
+
+          double dot = transformDot(Vtraj, Vdrive_norm);
+
+          Logger.recordOutput("DriveAlongTrajectory/Dot", dot);
+
+          Translation2d errorTranslation =
+              goalState.getTranslation().minus(drive.getPose().getTranslation());
+
+          ChassisSpeeds error =
+              new ChassisSpeeds(errorTranslation.getX(), errorTranslation.getY(), 0.0).times(0.5);
+
+          ChassisSpeeds speeds;
+
+          if (dot > 0.5 && errorTranslation.getNorm() < 1) {
+            speeds =
+                (trajectoryVelocity.times(dot * dot * dot).times(Vdrive.getTranslation().getNorm()))
+                    .plus(driverVelocity.times((1 - dot) * (1 - dot) * (1 - dot)))
+                    .plus(error);
+
+            Logger.recordOutput("DriveAlongTrajectory/Enabled", true);
+
+          } else {
+            speeds = driverVelocity;
+            Logger.recordOutput("DriveAlongTrajectory/Enabled", false);
+          }
+
+          Logger.recordOutput("DriveAlongTrajectory/EndGoal", end);
+
+          drive.runVelocity(
+              ChassisSpeeds.fromFieldRelativeSpeeds(
+                  new ChassisSpeeds(
+                      speeds.vxMetersPerSecond,
+                      speeds.vyMetersPerSecond,
+                      driverVelocity.omegaRadiansPerSecond
+                          - drive.getRotation().minus(endRotation).getRadians() * 1),
+                  drive.getRotation()));
+        },
+        (interrupted) -> {},
+        () -> {
+          return drive.getPose().getTranslation().getDistance(end.getTranslation()) < 0.75;
+        },
+        drive);
+  }
+
+  protected static double transformDot(Transform2d a, Transform2d b) {
+    return a.getX() * b.getX() + a.getY() * b.getY();
+  }
+
   /**
    * Measures the velocity feedforward constants for the drive motors.
    *
@@ -422,7 +538,35 @@ public class DriveCommands {
                     })));
   }
 
-  // public static Command azimuthTuning()
+  protected static Pose2d sampleTrajectory(PathPlannerPath trajectory, Pose2d pose) {
+    List<Pose2d> states = trajectory.getPathPoses();
+
+    // Find closest point to current pose
+    Pose2d lowerState = states.get(0);
+    Pose2d higherState = states.get(0);
+    double minDistance = Double.POSITIVE_INFINITY;
+    for (int i = 0; i < states.size() - 1; i++) {
+      double distance = states.get(i).getTranslation().getDistance(pose.getTranslation());
+      if (distance < minDistance) {
+        minDistance = distance;
+        lowerState = states.get(i);
+        higherState = states.get(i + 1);
+      }
+    }
+
+    double d = lowerState.getTranslation().getDistance(higherState.getTranslation());
+    double t = (pose.getTranslation().getDistance(lowerState.getTranslation())) / d;
+    t = MathUtil.clamp(t, 0.0, 1.0);
+
+    // Interpolate between states based on distance
+    // TODO: Fix this to actually get the closest point
+    Pose2d retPose = lowerState.interpolate(higherState, t);
+    Translation2d minusTrans = higherState.getTranslation().minus(lowerState.getTranslation());
+
+    // Get rotation between lower and higher states
+    return new Pose2d(
+        retPose.getTranslation(), new Rotation2d(minusTrans.getX(), minusTrans.getY()));
+  }
 
   private static class WheelRadiusCharacterizationState {
     double[] positions = new double[4];
