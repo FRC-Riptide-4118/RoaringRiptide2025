@@ -3,12 +3,11 @@
   "robotLength": 0.9,
   "holonomicMode": true,
   "pathFolders": [
-    "LeftHP",
-    "Reef"
+    "FromLeftHP",
+    "Reef",
+    "ToLeftHP"
   ],
-  "autoFolders": [
-    "New Folder"
-  ],
+  "autoFolders": [],
   "defaultMaxVel": 4.0,
   "defaultMaxAccel": 3.0,
   "defaultMaxAngVel": 540.0,

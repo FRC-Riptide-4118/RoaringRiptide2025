@@ -3,29 +3,45 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 3.6196875,
-        "y": 1.9459232954545451
+        "x": 3.8091477272727277,
+        "y": 2.8832528409090914
       },
       "prevControl": null,
       "nextControl": {
-        "x": 3.9606393716013875,
-        "y": 2.4807309144902434
+        "x": 3.557078423908951,
+        "y": 2.9598718395753774
       },
       "isLocked": false,
-      "linkedName": "DStart"
+      "linkedName": "CEnd"
     },
     {
       "anchor": {
-        "x": 4.118267045454545,
-        "y": 2.703764204545455
+        "x": 2.3134090909090905,
+        "y": 3.4017755681818174
       },
       "prevControl": {
-        "x": 3.738719885629564,
-        "y": 2.1562112364313633
+        "x": 2.5482142508029093,
+        "y": 3.1659950186630827
+      },
+      "nextControl": {
+        "x": 1.8078678770923546,
+        "y": 3.90941681955798
+      },
+      "isLocked": false,
+      "linkedName": null
+    },
+    {
+      "anchor": {
+        "x": 1.2065624999999998,
+        "y": 7.031434659090909
+      },
+      "prevControl": {
+        "x": 1.425304186433906,
+        "y": 6.349363861530332
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": "DEnd"
+      "linkedName": "LeftHP"
     }
   ],
   "rotationTargets": [],
@@ -41,11 +57,11 @@
     "unlimited": false
   },
   "goalEndState": {
-    "velocity": 1.0,
-    "rotation": 59.99999999999999
+    "velocity": 0,
+    "rotation": 125.00000000000001
   },
   "reversed": false,
-  "folder": "Reef",
+  "folder": "FromLeftHP",
   "idealStartingState": {
     "velocity": 0,
     "rotation": 59.99999999999999

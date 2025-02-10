@@ -14,6 +14,14 @@ public class CoralCommands {
       PositionJoint wrist,
       DoubleSupplier wristPos) {
 
-    return new ParallelCommandGroup(new PositionJointPositionCommand(wrist, wristPos));
+    return new ParallelCommandGroup(
+        new PositionJointPositionCommand(wrist, wristPos),
+        new PositionJointPositionCommand(elevator, elevatorPos));
+  }
+
+  public static Command CoralPresetCommand(
+      PositionJoint elevator, PositionJoint wrist, CoralPreset preset) {
+    return CoralPresetCommand(
+        elevator, preset::getElevatorPos, wrist, () -> preset.getWristPos().getRotations());
   }
 }

@@ -3,45 +3,45 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 1.2065624999999998,
-        "y": 7.031434659090909
+        "x": 4.9359375,
+        "y": 5.2963778409090905
       },
       "prevControl": null,
       "nextControl": {
-        "x": 1.3867823722573824,
-        "y": 6.858169551110298
+        "x": 4.796244684870011,
+        "y": 5.503708295500448
       },
       "isLocked": false,
-      "linkedName": "LeftHP"
+      "linkedName": "JEnd"
     },
     {
       "anchor": {
-        "x": 3.1609943181818183,
-        "y": 2.5143039772727276
+        "x": 4.237926136363637,
+        "y": 6.014332386363637
       },
       "prevControl": {
-        "x": 2.070284295253164,
-        "y": 3.294065491102118
+        "x": 4.478144832495627,
+        "y": 5.945086606501997
       },
       "nextControl": {
-        "x": 3.898940426914412,
-        "y": 1.9867375638599531
+        "x": 3.9004630177866635,
+        "y": 6.111609980475478
       },
       "isLocked": false,
       "linkedName": null
     },
     {
       "anchor": {
-        "x": 5.873267045454546,
-        "y": 2.2251278409090913
+        "x": 1.2065624999999998,
+        "y": 7.031434659090909
       },
       "prevControl": {
-        "x": 4.506025346855439,
-        "y": 2.440627816633636
+        "x": 2.391518141648956,
+        "y": 6.720728585823571
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": "FStart"
+      "linkedName": "LeftHP"
     }
   ],
   "rotationTargets": [],
@@ -58,13 +58,13 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": 119.99999999999999
+    "rotation": 125.00000000000001
   },
   "reversed": false,
-  "folder": "ToLeftHP",
+  "folder": "FromLeftHP",
   "idealStartingState": {
     "velocity": 0,
-    "rotation": 125.00000000000001
+    "rotation": -119.99999999999999
   },
   "useDefaultConstraints": true
 }

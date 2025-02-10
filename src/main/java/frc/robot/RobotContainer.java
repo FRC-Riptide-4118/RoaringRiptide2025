@@ -8,6 +8,7 @@ import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.button.CommandGenericHID;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.commands.DriveCommands;
@@ -35,6 +36,7 @@ import frc.robot.subsystems.vision.VisionConstants;
 import frc.robot.subsystems.vision.VisionIO;
 import frc.robot.subsystems.vision.VisionIOPhotonVisionSim;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
+import org.littletonrobotics.junction.networktables.LoggedNetworkBoolean;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -61,9 +63,12 @@ public class RobotContainer {
 
   // Controller
   private final CommandXboxController driverController = new CommandXboxController(0);
+  private final CommandGenericHID operatorController = new CommandGenericHID(1);
 
   // Dashboard inputs
   private final LoggedDashboardChooser<Command> autoChooser;
+
+  private final LoggedNetworkBoolean zeroButton;
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
@@ -264,6 +269,8 @@ public class RobotContainer {
     autoChooser.addOption(
         "Drive SysId (Dynamic Reverse)", drive.sysIdDynamic(SysIdRoutine.Direction.kReverse));
 
+    zeroButton = new LoggedNetworkBoolean("CoralChoosers/ZeroChooser", false);
+
     // Configure the button bindings
     configureButtonBindings();
   }
@@ -297,7 +304,7 @@ public class RobotContainer {
     // Switch to X pattern when X button is pressed
     driverController.x().onTrue(Commands.runOnce(drive::stopWithX, drive));
 
-    driverController.y().whileTrue(DriveCommands.driveToReef());
+    // driverController.y().whileTrue(DriveCommands.driveToReef());
     // // Reset gyro / odometry
     final Runnable resetGyro =
         () ->
@@ -312,6 +319,22 @@ public class RobotContainer {
 
     // Reset gyro to 0° when B button is pressed
     driverController.b().onTrue(Commands.runOnce(resetGyro, drive).ignoringDisable(true));
+
+    // operatorController
+    //     .button(1)
+    //     .or(new Trigger(zeroButton::get))
+    //     .onTrue(CoralCommands.CoralPresetCommand(elevator, wrist, CoralPresets.ZERO));
+
+    operatorController
+        .povDown()
+        .onTrue(
+            DriveCommands.joystickDriveAlongTrajectory(
+                    drive,
+                    "LeftHPToB",
+                    () -> -driverController.getLeftY(),
+                    () -> -driverController.getLeftX(),
+                    () -> -driverController.getRightX())
+                .andThen(DriveCommands.driveToReef("B")));
   }
 
   /**
