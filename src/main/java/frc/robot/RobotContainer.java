@@ -24,17 +24,11 @@ import frc.robot.subsystems.drive.drive_motor.DriveMotorIOSparkMax;
 import frc.robot.subsystems.drive.gyro.GyroIO;
 import frc.robot.subsystems.drive.gyro.GyroIOPigeon2SparkThread;
 import frc.robot.subsystems.drive.odometry_threads.SparkOdometryThread;
-import frc.robot.subsystems.flywheel.Flywheel;
-import frc.robot.subsystems.flywheel.FlywheelConstants;
-import frc.robot.subsystems.flywheel.FlywheelIOReplay;
-import frc.robot.subsystems.flywheel.FlywheelIOSim;
-import frc.robot.subsystems.flywheel.FlywheelIOSparkMax;
 import frc.robot.subsystems.position_joint.PositionJoint;
 import frc.robot.subsystems.position_joint.PositionJointConstants;
 import frc.robot.subsystems.position_joint.PositionJointIOReplay;
 import frc.robot.subsystems.position_joint.PositionJointIOSim;
 import frc.robot.subsystems.position_joint.PositionJointIOSparkMax;
-import frc.robot.subsystems.simulation.SimulationViewer;
 import frc.robot.subsystems.vision.TrigVisionIOPhotonVision;
 import frc.robot.subsystems.vision.Vision;
 import frc.robot.subsystems.vision.VisionConstants;
@@ -55,15 +49,15 @@ public class RobotContainer {
   @SuppressWarnings("unused")
   private final Vision vision;
 
-  private final Flywheel coralIntake;
+  //   private final Flywheel coralIntake;
 
-  private final Flywheel algaeIntake;
+  //   private final Flywheel algaeIntake;
 
   private final PositionJoint elevator;
 
-  private final PositionJoint wrist;
+  //   private final PositionJoint wrist;
 
-  private final SimulationViewer simulationViewer;
+  //   private final SimulationViewer simulationViewer;
 
   // Controller
   private final CommandXboxController driverController = new CommandXboxController(0);
@@ -125,22 +119,22 @@ public class RobotContainer {
                 new PositionJointIOSparkMax("Elevator", PositionJointConstants.ELEVATOR_CONFIG),
                 PositionJointConstants.ELEVATOR_GAINS);
 
-        wrist =
-            new PositionJoint(
-                new PositionJointIOSparkMax("Wrist", PositionJointConstants.WRIST_CONFIG),
-                PositionJointConstants.WRIST_GAINS);
+        // wrist =
+        //     new PositionJoint(
+        //         new PositionJointIOSparkMax("Wrist", PositionJointConstants.WRIST_CONFIG),
+        //         PositionJointConstants.WRIST_GAINS);
 
-        coralIntake =
-            new Flywheel(
-                new FlywheelIOSparkMax("Coral Intake", FlywheelConstants.CORAL_INTAKE_CONFIG),
-                FlywheelConstants.CORAL_INTAKE_GAINS);
+        // coralIntake =
+        //     new Flywheel(
+        //         new FlywheelIOSparkMax("Coral Intake", FlywheelConstants.CORAL_INTAKE_CONFIG),
+        //         FlywheelConstants.CORAL_INTAKE_GAINS);
 
-        algaeIntake =
-            new Flywheel(
-                new FlywheelIOSparkMax("Algae Intake", FlywheelConstants.ALGAE_INTAKE_CONFIG),
-                FlywheelConstants.ALGAE_INTAKE_GAINS);
+        // algaeIntake =
+        //     new Flywheel(
+        //         new FlywheelIOSparkMax("Algae Intake", FlywheelConstants.ALGAE_INTAKE_CONFIG),
+        //         FlywheelConstants.ALGAE_INTAKE_GAINS);
 
-        simulationViewer = new SimulationViewer(elevator::getPosition);
+        // simulationViewer = new SimulationViewer(elevator::getPosition);
 
         break;
 
@@ -184,22 +178,22 @@ public class RobotContainer {
                 new PositionJointIOSim("Elevator", PositionJointConstants.ELEVATOR_CONFIG),
                 PositionJointConstants.ELEVATOR_GAINS);
 
-        wrist =
-            new PositionJoint(
-                new PositionJointIOSim("Wrist", PositionJointConstants.WRIST_CONFIG),
-                PositionJointConstants.WRIST_GAINS);
+        // wrist =
+        //     new PositionJoint(
+        //         new PositionJointIOSim("Wrist", PositionJointConstants.WRIST_CONFIG),
+        //         PositionJointConstants.WRIST_GAINS);
 
-        coralIntake =
-            new Flywheel(
-                new FlywheelIOSim("Coral Intake", FlywheelConstants.CORAL_INTAKE_CONFIG),
-                FlywheelConstants.CORAL_INTAKE_GAINS);
+        // coralIntake =
+        //     new Flywheel(
+        //         new FlywheelIOSim("Coral Intake", FlywheelConstants.CORAL_INTAKE_CONFIG),
+        //         FlywheelConstants.CORAL_INTAKE_GAINS);
 
-        algaeIntake =
-            new Flywheel(
-                new FlywheelIOSim("Algae Intake", FlywheelConstants.ALGAE_INTAKE_CONFIG),
-                FlywheelConstants.ALGAE_INTAKE_GAINS);
+        // algaeIntake =
+        //     new Flywheel(
+        //         new FlywheelIOSim("Algae Intake", FlywheelConstants.ALGAE_INTAKE_CONFIG),
+        //         FlywheelConstants.ALGAE_INTAKE_GAINS);
 
-        simulationViewer = new SimulationViewer(elevator::getPosition);
+        // simulationViewer = new SimulationViewer(elevator::getPosition);
         break;
 
       default:
@@ -235,19 +229,19 @@ public class RobotContainer {
             new PositionJoint(
                 new PositionJointIOReplay("Elevator"), PositionJointConstants.ELEVATOR_GAINS);
 
-        wrist =
-            new PositionJoint(
-                new PositionJointIOReplay("Wrist"), PositionJointConstants.WRIST_GAINS);
+        // wrist =
+        //     new PositionJoint(
+        //         new PositionJointIOReplay("Wrist"), PositionJointConstants.WRIST_GAINS);
 
-        coralIntake =
-            new Flywheel(
-                new FlywheelIOReplay("Coral Intake"), FlywheelConstants.CORAL_INTAKE_GAINS);
+        // coralIntake =
+        //     new Flywheel(
+        //         new FlywheelIOReplay("Coral Intake"), FlywheelConstants.CORAL_INTAKE_GAINS);
 
-        algaeIntake =
-            new Flywheel(
-                new FlywheelIOReplay("Algae Intake"), FlywheelConstants.ALGAE_INTAKE_GAINS);
+        // algaeIntake =
+        //     new Flywheel(
+        //         new FlywheelIOReplay("Algae Intake"), FlywheelConstants.ALGAE_INTAKE_GAINS);
 
-        simulationViewer = new SimulationViewer(elevator::getPosition);
+        // simulationViewer = new SimulationViewer(elevator::getPosition);
         break;
     }
 

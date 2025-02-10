@@ -52,7 +52,7 @@ public class PositionJointConstants {
   public static final PositionJointHardwareConfig ELEVATOR_CONFIG =
       new PositionJointHardwareConfig(
           new int[] {19, 20},
-          new boolean[] {false, true},
+          new boolean[] {true, true},
           1.0 / 1.0,
           15,
           GravityType.CONSTANT,
