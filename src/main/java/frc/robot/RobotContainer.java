@@ -57,6 +57,8 @@ public class RobotContainer {
 
   private final PositionJoint elevator;
 
+  private final PositionJoint climber;
+
   //   private final PositionJoint wrist;
 
   //   private final SimulationViewer simulationViewer;
@@ -124,6 +126,11 @@ public class RobotContainer {
                 new PositionJointIOSparkMax("Elevator", PositionJointConstants.ELEVATOR_CONFIG),
                 PositionJointConstants.ELEVATOR_GAINS);
 
+        climber =
+            new PositionJoint(
+                new PositionJointIOSparkMax("Climber", PositionJointConstants.CLIMBER_CONFIG),
+                PositionJointConstants.CLIMBER_GAINS);
+
         // wrist =
         //     new PositionJoint(
         //         new PositionJointIOSparkMax("Wrist", PositionJointConstants.WRIST_CONFIG),
@@ -183,6 +190,11 @@ public class RobotContainer {
                 new PositionJointIOSim("Elevator", PositionJointConstants.ELEVATOR_CONFIG),
                 PositionJointConstants.ELEVATOR_GAINS);
 
+        climber =
+            new PositionJoint(
+                new PositionJointIOSim("Climber", PositionJointConstants.CLIMBER_CONFIG),
+                PositionJointConstants.CLIMBER_GAINS);
+
         // wrist =
         //     new PositionJoint(
         //         new PositionJointIOSim("Wrist", PositionJointConstants.WRIST_CONFIG),
@@ -233,6 +245,10 @@ public class RobotContainer {
         elevator =
             new PositionJoint(
                 new PositionJointIOReplay("Elevator"), PositionJointConstants.ELEVATOR_GAINS);
+
+        climber =
+            new PositionJoint(
+                new PositionJointIOReplay("Climber"), PositionJointConstants.CLIMBER_GAINS);
 
         // wrist =
         //     new PositionJoint(
