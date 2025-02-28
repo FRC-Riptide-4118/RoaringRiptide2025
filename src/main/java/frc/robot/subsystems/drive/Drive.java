@@ -69,7 +69,12 @@ public class Drive extends SubsystemBase {
       new SwerveDrivePoseEstimator(kinematics, rawGyroRotation, lastModulePositions, new Pose2d());
 
   private final SwerveSetpointGenerator setpointGenerator;
-  private ModuleLimits currentModuleLimits = new ModuleLimits(10, 10, 10, 10);
+  private ModuleLimits currentModuleLimits =
+      new ModuleLimits(
+          DriveConstants.maxSpeedAt12Volts.in(MetersPerSecond),
+          DriveConstants.maxDriveAcceleration.in(MetersPerSecondPerSecond),
+          DriveConstants.maxDriveDeceleration.in(MetersPerSecondPerSecond),
+          DriveConstants.maxSteerVelocity.in(RadiansPerSecond));
   private SwerveSetpoint currentSetpoint =
       new SwerveSetpoint(
           new ChassisSpeeds(),
@@ -186,10 +191,22 @@ public class Drive extends SubsystemBase {
     azimuthkV = new LoggedTunableNumber("Drive/AzimuthMotors/Gains/kV", azimuthGains.kV());
     azimuthkA = new LoggedTunableNumber("Drive/AzimuthMotors/Gains/kA", azimuthGains.kA());
 
-    kMaxDriveVelocity = new LoggedTunableNumber("Drive/ModuleLimits/kMaxDriveVelocity", 15);
-    kMaxDriveAcceleration = new LoggedTunableNumber("Drive/ModuleLimits/kMaxDriveAcceleration", 20);
-    kMaxDriveDeceleration = new LoggedTunableNumber("Drive/ModuleLimits/kMaxDriveDeceleration", 40);
-    kMaxSteeringVelocity = new LoggedTunableNumber("Drive/ModuleLimits/kMaxSteeringVelocity", 40);
+    kMaxDriveVelocity =
+        new LoggedTunableNumber(
+            "Drive/ModuleLimits/kMaxDriveVelocityMetersPerSec",
+            currentModuleLimits.maxDriveVelocity());
+    kMaxDriveAcceleration =
+        new LoggedTunableNumber(
+            "Drive/ModuleLimits/kMaxDriveAccelerationMetersPerSecSq",
+            currentModuleLimits.maxDriveAcceleration());
+    kMaxDriveDeceleration =
+        new LoggedTunableNumber(
+            "Drive/ModuleLimits/kMaxDriveDecelerationMetersPerSecSq",
+            currentModuleLimits.maxDriveDeceleration());
+    kMaxSteeringVelocity =
+        new LoggedTunableNumber(
+            "Drive/ModuleLimits/kMaxSteeringVelocityRadPerSec",
+            currentModuleLimits.maxSteeringVelocity());
   }
 
   @Override

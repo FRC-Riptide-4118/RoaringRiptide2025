@@ -1,10 +1,12 @@
 package frc.robot.subsystems.drive;
 
+import static edu.wpi.first.units.Units.DegreesPerSecond;
 import static edu.wpi.first.units.Units.FeetPerSecond;
 import static edu.wpi.first.units.Units.Kilogram;
 import static edu.wpi.first.units.Units.KilogramSquareMeters;
 import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.MetersPerSecond;
+import static edu.wpi.first.units.Units.MetersPerSecondPerSecond;
 import static edu.wpi.first.units.Units.Volts;
 
 import com.ctre.phoenix6.CANBus;
@@ -14,6 +16,8 @@ import com.pathplanner.lib.path.PathConstraints;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.units.measure.AngularVelocity;
+import edu.wpi.first.units.measure.LinearAcceleration;
 import edu.wpi.first.units.measure.LinearVelocity;
 import frc.robot.subsystems.drive.azimuth_motor.AzimuthMotorConstants;
 import frc.robot.subsystems.drive.drive_motor.DriveMotorConstants;
@@ -42,11 +46,13 @@ public class DriveConstants {
         new Translation2d(-trackWidth / 2.0, -wheelBase / 2.0)
       };
 
-  public static final double kSteerInertia = 0.004;
-  public static final double kDriveInertia = 0.025;
-
   public static final LinearVelocity maxSpeedAt12Volts =
       FeetPerSecond.of(15); // MK4i 16.5 ft/s L3 Kraken FOC With 14t pinion
+
+  public static final LinearAcceleration maxDriveAcceleration = MetersPerSecondPerSecond.of(10);
+  public static final LinearAcceleration maxDriveDeceleration = MetersPerSecondPerSecond.of(20);
+
+  public static final AngularVelocity maxSteerVelocity = DegreesPerSecond.of(360);
 
   // Drive motor configuration
   public static final int driveMotorCurrentLimit = 50;
