@@ -67,6 +67,7 @@ public class RobotContainer {
 
   private final PositionJoint wrist;
 
+  @SuppressWarnings("unused")
   private final Components simComponents;
 
   // Controller
@@ -181,27 +182,27 @@ public class RobotContainer {
         elevator =
             new PositionJoint(
                 new PositionJointIOSim("Elevator", PositionJointConstants.ELEVATOR_CONFIG),
-                PositionJointConstants.ELEVATOR_GAINS);
+                PositionJointConstants.ELEVATOR_GAINS_SIM);
 
         climber =
             new PositionJoint(
                 new PositionJointIOSim("Climber", PositionJointConstants.CLIMBER_CONFIG),
-                PositionJointConstants.CLIMBER_GAINS);
+                PositionJointConstants.CLIMBER_GAINS_SIM);
 
         wrist =
             new PositionJoint(
                 new PositionJointIOSim("Wrist", PositionJointConstants.WRIST_CONFIG),
-                PositionJointConstants.WRIST_GAINS);
+                PositionJointConstants.WRIST_GAINS_SIM);
 
         coralIntake =
             new Flywheel(
                 new FlywheelIOSim("Coral Intake", FlywheelConstants.CORAL_INTAKE_CONFIG),
-                FlywheelConstants.CORAL_INTAKE_GAINS);
+                FlywheelConstants.CORAL_INTAKE_GAINS_SIM);
 
         algaeIntake =
             new Flywheel(
                 new FlywheelIOSim("Algae Intake", FlywheelConstants.ALGAE_INTAKE_CONFIG),
-                FlywheelConstants.ALGAE_INTAKE_GAINS);
+                FlywheelConstants.ALGAE_INTAKE_GAINS_SIM);
         break;
 
       default:

@@ -39,7 +39,7 @@ public class PositionJointConstants {
       int[] canIds,
       boolean[] reversed,
       double gearRatio,
-      double currentLimit,
+      int currentLimit,
       GravityType gravity,
       EncoderType encoderType,
       int encoderID,
@@ -47,13 +47,16 @@ public class PositionJointConstants {
       String canBus) {}
 
   public static final PositionJointGains ELEVATOR_GAINS =
-      new PositionJointGains(0.05, 0.00001, 0, 0.112, 0, 0.115, 0.008, 20, 30, 0, 100, 0, 0);
+      new PositionJointGains(0.0, 0.0, 0, 0.0, 0.0, 0.0, 0.0, 0.09, 0.0, 0.0, 0.0, 0.0, 0.0);
+
+  public static final PositionJointGains ELEVATOR_GAINS_SIM =
+      new PositionJointGains(0.0, 0.0, 0, 0.0, 0.0, 1.0, 0.0, 0.5, 0.5, 0.0, 1.0, 0.0, 0.0);
 
   public static final PositionJointHardwareConfig ELEVATOR_CONFIG =
       new PositionJointHardwareConfig(
           new int[] {19, 20},
           new boolean[] {true, true},
-          1.0 / 1.0,
+          8.0 / 1.0,
           15,
           GravityType.CONSTANT,
           EncoderType.INTERNAL,
@@ -64,13 +67,16 @@ public class PositionJointConstants {
   public static final PositionJointGains WRIST_GAINS =
       new PositionJointGains(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
 
+  public static final PositionJointGains WRIST_GAINS_SIM =
+      new PositionJointGains(0, 0, 0, 0, 0, 1.0, 0, 0.5, 0.5, 0.0, 1.0, 0, 0);
+
   public static final PositionJointHardwareConfig WRIST_CONFIG =
       new PositionJointHardwareConfig(
           new int[] {10},
           new boolean[] {false},
           // TODO: might have to change gear ratio
           25.0 / 1.0,
-          40,
+          10,
           GravityType.COSINE,
           EncoderType.EXTERNAL_CANCODER,
           1,
@@ -78,6 +84,9 @@ public class PositionJointConstants {
           "");
 
   public static final PositionJointGains CLIMBER_GAINS =
+      new PositionJointGains(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
+
+  public static final PositionJointGains CLIMBER_GAINS_SIM =
       new PositionJointGains(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
 
   public static final PositionJointHardwareConfig CLIMBER_CONFIG =

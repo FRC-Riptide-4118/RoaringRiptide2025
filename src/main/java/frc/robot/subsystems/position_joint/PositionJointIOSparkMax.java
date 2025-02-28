@@ -82,6 +82,7 @@ public class PositionJointIOSparkMax implements PositionJointIO {
         new SparkMaxConfig()
             .inverted(config.reversed()[0])
             .idleMode(IdleMode.kBrake)
+            .smartCurrentLimit(config.currentLimit())
             .apply(
                 new EncoderConfig()
                     .positionConversionFactor(1.0 / config.gearRatio())
@@ -177,6 +178,7 @@ public class PositionJointIOSparkMax implements PositionJointIO {
           new SparkMaxConfig()
               .follow(motors[0])
               .inverted(config.reversed()[i])
+              .smartCurrentLimit(config.currentLimit())
               .idleMode(IdleMode.kBrake),
           ResetMode.kNoResetSafeParameters,
           PersistMode.kNoPersistParameters);
