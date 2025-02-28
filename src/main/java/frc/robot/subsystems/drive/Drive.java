@@ -30,6 +30,8 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.Constants;
 import frc.robot.Constants.Mode;
+import frc.robot.subsystems.drive.azimuth_motor.AzimuthMotorConstants.AzimuthMotorGains;
+import frc.robot.subsystems.drive.drive_motor.DriveMotorConstants.DriveMotorGains;
 import frc.robot.subsystems.drive.gyro.GyroIO;
 import frc.robot.subsystems.drive.gyro.GyroIOInputsAutoLogged;
 import frc.robot.subsystems.drive.odometry_threads.PhoenixOdometryThread;
@@ -79,12 +81,26 @@ public class Drive extends SubsystemBase {
           },
           new double[4]);
 
+  private Rotation2d headingOffset = new Rotation2d();
+
+  private final LoggedTunableNumber drivekP;
+  private final LoggedTunableNumber drivekI;
+  private final LoggedTunableNumber drivekD;
+  private final LoggedTunableNumber drivekS;
+  private final LoggedTunableNumber drivekV;
+  private final LoggedTunableNumber drivekA;
+
+  private final LoggedTunableNumber azimuthkP;
+  private final LoggedTunableNumber azimuthkI;
+  private final LoggedTunableNumber azimuthkD;
+  private final LoggedTunableNumber azimuthkS;
+  private final LoggedTunableNumber azimuthkV;
+  private final LoggedTunableNumber azimuthkA;
+
   private final LoggedTunableNumber kMaxDriveVelocity;
   private final LoggedTunableNumber kMaxDriveAcceleration;
   private final LoggedTunableNumber kMaxDriveDeceleration;
   private final LoggedTunableNumber kMaxSteeringVelocity;
-
-  private Rotation2d headingOffset = new Rotation2d();
 
   public Drive(
       GyroIO gyroIO,
@@ -92,6 +108,8 @@ public class Drive extends SubsystemBase {
       Module frModuleIO,
       Module blModuleIO,
       Module brModuleIO,
+      DriveMotorGains driveGains,
+      AzimuthMotorGains azimuthGains,
       PhoenixOdometryThread phoenixOdometryThread,
       SparkOdometryThread sparkOdometryThread) {
     this.gyroIO = gyroIO;
@@ -107,11 +125,6 @@ public class Drive extends SubsystemBase {
             DriveConstants.moduleTranslations[1],
             DriveConstants.moduleTranslations[2],
             DriveConstants.moduleTranslations[3]);
-
-    kMaxDriveVelocity = new LoggedTunableNumber("Drive/ModuleLimits/kMaxDriveVelocity", 15);
-    kMaxDriveAcceleration = new LoggedTunableNumber("Drive/ModuleLimits/kMaxDriveAcceleration", 20);
-    kMaxDriveDeceleration = new LoggedTunableNumber("Drive/ModuleLimits/kMaxDriveDeceleration", 40);
-    kMaxSteeringVelocity = new LoggedTunableNumber("Drive/ModuleLimits/kMaxSteeringVelocity", 40);
 
     // Usage reporting for swerve template
     HAL.report(tResourceType.kResourceType_RobotDrive, tInstances.kRobotDriveSwerve_AdvantageKit);
@@ -158,6 +171,25 @@ public class Drive extends SubsystemBase {
                 (state) -> Logger.recordOutput("Drive/SysIdState", state.toString())),
             new SysIdRoutine.Mechanism(
                 (voltage) -> runCharacterization(voltage.in(Volts)), null, this));
+
+    drivekP = new LoggedTunableNumber("Drive/DriveMotors/Gains/kP", driveGains.kP());
+    drivekI = new LoggedTunableNumber("Drive/DriveMotors/Gains/kI", driveGains.kI());
+    drivekD = new LoggedTunableNumber("Drive/DriveMotors/Gains/kD", driveGains.kD());
+    drivekS = new LoggedTunableNumber("Drive/DriveMotors/Gains/kS", driveGains.kS());
+    drivekV = new LoggedTunableNumber("Drive/DriveMotors/Gains/kV", driveGains.kV());
+    drivekA = new LoggedTunableNumber("Drive/DriveMotors/Gains/kA", driveGains.kA());
+
+    azimuthkP = new LoggedTunableNumber("Drive/AzimuthMotors/Gains/kP", azimuthGains.kP());
+    azimuthkI = new LoggedTunableNumber("Drive/AzimuthMotors/Gains/kI", azimuthGains.kI());
+    azimuthkD = new LoggedTunableNumber("Drive/AzimuthMotors/Gains/kD", azimuthGains.kD());
+    azimuthkS = new LoggedTunableNumber("Drive/AzimuthMotors/Gains/kS", azimuthGains.kS());
+    azimuthkV = new LoggedTunableNumber("Drive/AzimuthMotors/Gains/kV", azimuthGains.kV());
+    azimuthkA = new LoggedTunableNumber("Drive/AzimuthMotors/Gains/kA", azimuthGains.kA());
+
+    kMaxDriveVelocity = new LoggedTunableNumber("Drive/ModuleLimits/kMaxDriveVelocity", 15);
+    kMaxDriveAcceleration = new LoggedTunableNumber("Drive/ModuleLimits/kMaxDriveAcceleration", 20);
+    kMaxDriveDeceleration = new LoggedTunableNumber("Drive/ModuleLimits/kMaxDriveDeceleration", 40);
+    kMaxSteeringVelocity = new LoggedTunableNumber("Drive/ModuleLimits/kMaxSteeringVelocity", 40);
   }
 
   @Override
@@ -218,6 +250,30 @@ public class Drive extends SubsystemBase {
 
     // Update gyro alert
     gyroDisconnectedAlert.set(!gyroInputs.connected && Constants.currentMode != Mode.SIM);
+
+    LoggedTunableNumber.ifChanged(
+        hashCode(),
+        (values) -> {
+          for (int i = 0; i < 4; i++) {
+            modules[i].setGains(
+                new DriveMotorGains(
+                    values[0], values[1], values[2], values[3], values[4], values[5]),
+                new AzimuthMotorGains(
+                    values[6], values[7], values[8], values[9], values[10], values[11]));
+          }
+        },
+        drivekP,
+        drivekI,
+        drivekD,
+        drivekS,
+        drivekV,
+        drivekA,
+        azimuthkP,
+        azimuthkI,
+        azimuthkD,
+        azimuthkS,
+        azimuthkV,
+        azimuthkA);
 
     LoggedTunableNumber.ifChanged(
         hashCode(),

@@ -127,7 +127,7 @@ public class DriveMotorIOSim implements DriveMotorIO {
 
   @Override
   public void setGains(DriveMotorGains gains) {
-    controller.setPID(gains.kP() * 100, gains.kI(), gains.kD());
+    controller.setPID(gains.kP(), gains.kI(), gains.kD());
     feedforward.setGains(gains.kS(), gains.kV(), gains.kA());
   }
 
