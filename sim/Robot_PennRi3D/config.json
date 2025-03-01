@@ -4,6 +4,10 @@
     {
       "axis": "x",
       "degrees": 90
+    },
+    {
+      "axis": "z",
+      "degrees": 90
     }
   ],
   "position": [
@@ -24,7 +28,7 @@
         },
         {
           "axis": "z",
-          "degrees": 0
+          "degrees": 90
         }
       ],
       "zeroedPosition": [
@@ -45,7 +49,7 @@
         },
         {
           "axis": "z",
-          "degrees": 0
+          "degrees": 90
         }
       ],
       "zeroedPosition": [
@@ -66,7 +70,7 @@
         },
         {
           "axis": "z",
-          "degrees": 0
+          "degrees": 90
         }
       ],
       "zeroedPosition": [
@@ -87,7 +91,7 @@
         },
         {
           "axis": "z",
-          "degrees": 0
+          "degrees": 90
         }
       ],
       "zeroedPosition": [
@@ -99,34 +103,11 @@
   ],
   "cameras": [
     {
-      "name": "Front Left",
+      "name": "Front Bottom",
       "rotations": [
         {
           "axis": "y",
-          "degrees": -20
-        },
-        {
-          "axis": "z",
-          "degrees": -20
-        }
-      ],
-      "position": [
-        0.267,
-        0.281,
-        0.211
-      ],
-      "resolution": [
-        1280,
-        720
-      ],
-      "fov": 70
-    },
-    {
-      "name": "Front Right",
-      "rotations": [
-        {
-          "axis": "y",
-          "degrees": -40
+          "degrees": -10
         },
         {
           "axis": "z",
@@ -134,84 +115,15 @@
         }
       ],
       "position": [
-        0.274,
-        -0.277,
-        0.219
-      ],
-      "resolution": [
-        1280,
-        720
-      ],
-      "fov": 70
-    },
-    {
-      "name": "Rear Left",
-      "rotations": [
-        {
-          "axis": "y",
-          "degrees": -40
-        },
-        {
-          "axis": "z",
-          "degrees": -180
-        }
-      ],
-      "position": [
-        -0.274,
-        0.277,
-        0.219
-      ],
-      "resolution": [
-        1280,
-        720
-      ],
-      "fov": 70
-    },
-    {
-      "name": "Rear Right",
-      "rotations": [
-        {
-          "axis": "y",
-          "degrees": -20
-        },
-        {
-          "axis": "z",
-          "degrees": -200
-        }
-      ],
-      "position": [
-        -0.267,
-        -0.281,
-        0.211
-      ],
-      "resolution": [
-        1280,
-        720
-      ],
-      "fov": 70
-    },
-    {
-      "name": "Limelight",
-      "rotations": [
-        {
-          "axis": "y",
-          "degrees": 180
-        },
-        {
-          "axis": "x",
-          "degrees": 180
-        }
-      ],
-      "position": [
-        -0.345,
+        0.41,
         0.0,
-        0.214
+        0.102
       ],
       "resolution": [
         320,
         240
       ],
-      "fov": 59.6
+      "fov": 62.5
     }
   ],
   "name": "Penn"

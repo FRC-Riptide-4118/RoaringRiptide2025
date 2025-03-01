@@ -26,21 +26,16 @@ import frc.robot.subsystems.drive.drive_motor.DriveMotorIOSparkMax;
 import frc.robot.subsystems.drive.gyro.GyroIO;
 import frc.robot.subsystems.drive.gyro.GyroIOPigeon2SparkThread;
 import frc.robot.subsystems.drive.odometry_threads.SparkOdometryThread;
-import frc.robot.subsystems.flywheel.Flywheel;
-import frc.robot.subsystems.flywheel.FlywheelConstants;
-import frc.robot.subsystems.flywheel.FlywheelIOReplay;
-import frc.robot.subsystems.flywheel.FlywheelIOSim;
-import frc.robot.subsystems.flywheel.FlywheelIOSparkMax;
 import frc.robot.subsystems.position_joint.PositionJoint;
 import frc.robot.subsystems.position_joint.PositionJointConstants;
 import frc.robot.subsystems.position_joint.PositionJointIOReplay;
 import frc.robot.subsystems.position_joint.PositionJointIOSim;
 import frc.robot.subsystems.position_joint.PositionJointIOSparkMax;
-import frc.robot.subsystems.vision.TrigVisionIOPhotonVision;
 import frc.robot.subsystems.vision.Vision;
 import frc.robot.subsystems.vision.VisionConstants;
 import frc.robot.subsystems.vision.VisionIO;
 import frc.robot.subsystems.vision.VisionIOPhotonVisionSim;
+import frc.robot.subsystems.vision.VisionIOPhotonVisionTrig;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 import org.littletonrobotics.junction.networktables.LoggedNetworkBoolean;
 
@@ -57,9 +52,9 @@ public class RobotContainer {
   @SuppressWarnings("unused")
   private final Vision vision;
 
-  private final Flywheel coralIntake;
+  //   private final Flywheel coralIntake;
 
-  private final Flywheel algaeIntake;
+  //   private final Flywheel algaeIntake;
 
   private final PositionJoint elevator;
 
@@ -117,7 +112,7 @@ public class RobotContainer {
         vision =
             new Vision(
                 drive::addVisionMeasurement,
-                new TrigVisionIOPhotonVision(
+                new VisionIOPhotonVisionTrig(
                     VisionConstants.camera0Name,
                     VisionConstants.robotToCamera0,
                     drive::getRotation));
@@ -137,15 +132,15 @@ public class RobotContainer {
                 new PositionJointIOSparkMax("Wrist", PositionJointConstants.WRIST_CONFIG),
                 PositionJointConstants.WRIST_GAINS);
 
-        coralIntake =
-            new Flywheel(
-                new FlywheelIOSparkMax("Coral Intake", FlywheelConstants.CORAL_INTAKE_CONFIG),
-                FlywheelConstants.CORAL_INTAKE_GAINS);
+        // coralIntake =
+        //     new Flywheel(
+        //         new FlywheelIOSparkMax("Coral Intake", FlywheelConstants.CORAL_INTAKE_CONFIG),
+        //         FlywheelConstants.CORAL_INTAKE_GAINS);
 
-        algaeIntake =
-            new Flywheel(
-                new FlywheelIOSparkMax("Algae Intake", FlywheelConstants.ALGAE_INTAKE_CONFIG),
-                FlywheelConstants.ALGAE_INTAKE_GAINS);
+        // algaeIntake =
+        //     new Flywheel(
+        //         new FlywheelIOSparkMax("Algae Intake", FlywheelConstants.ALGAE_INTAKE_CONFIG),
+        //         FlywheelConstants.ALGAE_INTAKE_GAINS);
 
         break;
 
@@ -194,15 +189,15 @@ public class RobotContainer {
                 new PositionJointIOSim("Wrist", PositionJointConstants.WRIST_CONFIG),
                 PositionJointConstants.WRIST_GAINS_SIM);
 
-        coralIntake =
-            new Flywheel(
-                new FlywheelIOSim("Coral Intake", FlywheelConstants.CORAL_INTAKE_CONFIG),
-                FlywheelConstants.CORAL_INTAKE_GAINS_SIM);
+        // coralIntake =
+        //     new Flywheel(
+        //         new FlywheelIOSim("Coral Intake", FlywheelConstants.CORAL_INTAKE_CONFIG),
+        //         FlywheelConstants.CORAL_INTAKE_GAINS_SIM);
 
-        algaeIntake =
-            new Flywheel(
-                new FlywheelIOSim("Algae Intake", FlywheelConstants.ALGAE_INTAKE_CONFIG),
-                FlywheelConstants.ALGAE_INTAKE_GAINS_SIM);
+        // algaeIntake =
+        //     new Flywheel(
+        //         new FlywheelIOSim("Algae Intake", FlywheelConstants.ALGAE_INTAKE_CONFIG),
+        //         FlywheelConstants.ALGAE_INTAKE_GAINS_SIM);
         break;
 
       default:
@@ -240,13 +235,13 @@ public class RobotContainer {
             new PositionJoint(
                 new PositionJointIOReplay("Wrist"), PositionJointConstants.WRIST_GAINS);
 
-        coralIntake =
-            new Flywheel(
-                new FlywheelIOReplay("Coral Intake"), FlywheelConstants.CORAL_INTAKE_GAINS);
+        // coralIntake =
+        //     new Flywheel(
+        //         new FlywheelIOReplay("Coral Intake"), FlywheelConstants.CORAL_INTAKE_GAINS);
 
-        algaeIntake =
-            new Flywheel(
-                new FlywheelIOReplay("Algae Intake"), FlywheelConstants.ALGAE_INTAKE_GAINS);
+        // algaeIntake =
+        //     new Flywheel(
+        //         new FlywheelIOReplay("Algae Intake"), FlywheelConstants.ALGAE_INTAKE_GAINS);
 
         break;
     }
