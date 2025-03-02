@@ -47,17 +47,17 @@ public class PositionJointConstants {
       String canBus) {}
 
   public static final PositionJointGains ELEVATOR_GAINS =
-      new PositionJointGains(0.0, 0.0, 0, 0.0, 0.0, 0.0, 0.0, 0.09, 0.0, 0.0, 0.0, 0.0, 0.0);
+      new PositionJointGains(0.0, 0.0, 0, 0.0, 0.0, 0.0, 0.0, 2.0, 2.0, 0.0, 1.0, 0.0, 0.0);
 
   public static final PositionJointGains ELEVATOR_GAINS_SIM =
       new PositionJointGains(0.0, 0.0, 0, 0.0, 0.0, 1.0, 0.0, 0.5, 0.5, 0.0, 1.0, 0.0, 0.0);
-
+  // 36 / 1.27
   public static final PositionJointHardwareConfig ELEVATOR_CONFIG =
       new PositionJointHardwareConfig(
           new int[] {19, 20},
           new boolean[] {true, true},
-          8.0 / 1.0,
-          15,
+          36.0 / 1.27,
+          50,
           GravityType.CONSTANT,
           EncoderType.INTERNAL,
           -1,
@@ -65,22 +65,21 @@ public class PositionJointConstants {
           "");
 
   public static final PositionJointGains WRIST_GAINS =
-      new PositionJointGains(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
+      new PositionJointGains(0, 0, 0, 0, 0, 0.5, 0, 0.1, 0.1, -0.18, 0.15, 0, 0);
 
   public static final PositionJointGains WRIST_GAINS_SIM =
-      new PositionJointGains(0, 0, 0, 0, 0, 1.0, 0, 0.5, 0.5, 0.0, 1.0, 0, 0);
+      new PositionJointGains(0, 0, 0, 0, 0, 0.0, 0, 0.0, 0.0, 0.0, 1.0, 0, 0);
 
   public static final PositionJointHardwareConfig WRIST_CONFIG =
       new PositionJointHardwareConfig(
-          new int[] {10},
+          new int[] {11},
           new boolean[] {false},
-          // TODO: might have to change gear ratio
-          25.0 / 1.0,
-          10,
+          9.0 / 1.0,
+          40,
           GravityType.COSINE,
           EncoderType.EXTERNAL_CANCODER,
-          1,
-          Rotation2d.fromRotations(0),
+          2,
+          Rotation2d.fromRotations(0.448486),
           "");
 
   public static final PositionJointGains CLIMBER_GAINS =

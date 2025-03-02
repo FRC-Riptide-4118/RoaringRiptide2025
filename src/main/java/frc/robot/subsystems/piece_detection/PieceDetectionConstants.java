@@ -9,5 +9,5 @@ public final class PieceDetectionConstants {
 
   public static final PieceDetectionConfig EXAMPLE_CONFIG =
       new PieceDetectionConfig(
-          new Transform3d(new Translation3d(0.2, 0.1, 0), new Rotation3d(90, 20, 0)));
+          new Transform3d(new Translation3d(0.2012, 0.0, 0.2708), new Rotation3d()));
 }

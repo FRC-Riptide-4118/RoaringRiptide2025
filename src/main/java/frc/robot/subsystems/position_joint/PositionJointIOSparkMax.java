@@ -16,6 +16,7 @@ import com.revrobotics.spark.config.EncoderConfig;
 import com.revrobotics.spark.config.SparkBaseConfig;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.config.SparkMaxConfig;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.Alert.AlertType;
 import edu.wpi.first.wpilibj.RobotController;
@@ -176,8 +177,7 @@ public class PositionJointIOSparkMax implements PositionJointIO {
       motors[i] = new SparkMax(config.canIds()[i], MotorType.kBrushless);
       motors[i].configure(
           new SparkMaxConfig()
-              .follow(motors[0])
-              .inverted(config.reversed()[i])
+              .follow(motors[0], config.reversed()[i])
               .smartCurrentLimit(config.currentLimit())
               .idleMode(IdleMode.kBrake),
           ResetMode.kNoResetSafeParameters,
@@ -272,7 +272,8 @@ public class PositionJointIOSparkMax implements PositionJointIO {
             positionSetpoint,
             ControlType.kPosition,
             ClosedLoopSlot.kSlot0,
-            feedforward.calculate(ffposition, velocitySetpoint, desiredVelocity, 0.02)
+            feedforward.calculate(
+                    Units.rotationsToRadians(ffposition), velocitySetpoint, desiredVelocity, 0.02)
                 + externalFeedforward.getAsDouble());
 
     velocitySetpoint = desiredVelocity;

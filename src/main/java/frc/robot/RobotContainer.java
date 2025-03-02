@@ -26,6 +26,9 @@ import frc.robot.subsystems.drive.drive_motor.DriveMotorIOSparkMax;
 import frc.robot.subsystems.drive.gyro.GyroIO;
 import frc.robot.subsystems.drive.gyro.GyroIOPigeon2SparkThread;
 import frc.robot.subsystems.drive.odometry_threads.SparkOdometryThread;
+import frc.robot.subsystems.led.LED;
+import frc.robot.subsystems.led.LEDIOBlinkin;
+import frc.robot.subsystems.led.LEDIOReplay;
 import frc.robot.subsystems.position_joint.PositionJoint;
 import frc.robot.subsystems.position_joint.PositionJointConstants;
 import frc.robot.subsystems.position_joint.PositionJointIOReplay;
@@ -61,6 +64,8 @@ public class RobotContainer {
   private final PositionJoint climber;
 
   private final PositionJoint wrist;
+
+  private final LED led;
 
   @SuppressWarnings("unused")
   private final Components simComponents;
@@ -115,6 +120,10 @@ public class RobotContainer {
                 new VisionIOPhotonVisionTrig(
                     VisionConstants.camera0Name,
                     VisionConstants.robotToCamera0,
+                    drive::getRotation),
+                new VisionIOPhotonVisionTrig(
+                    VisionConstants.camera1Name,
+                    VisionConstants.robotToCamera1,
                     drive::getRotation));
 
         elevator =
@@ -142,6 +151,7 @@ public class RobotContainer {
         //         new FlywheelIOSparkMax("Algae Intake", FlywheelConstants.ALGAE_INTAKE_CONFIG),
         //         FlywheelConstants.ALGAE_INTAKE_GAINS);
 
+        led = new LED(new LEDIOBlinkin("LED", 9));
         break;
 
       case SIM:
@@ -198,6 +208,8 @@ public class RobotContainer {
         //     new Flywheel(
         //         new FlywheelIOSim("Algae Intake", FlywheelConstants.ALGAE_INTAKE_CONFIG),
         //         FlywheelConstants.ALGAE_INTAKE_GAINS_SIM);
+
+        led = new LED(new LEDIOReplay("LED"));
         break;
 
       default:
@@ -242,6 +254,8 @@ public class RobotContainer {
         // algaeIntake =
         //     new Flywheel(
         //         new FlywheelIOReplay("Algae Intake"), FlywheelConstants.ALGAE_INTAKE_GAINS);
+
+        led = new LED(new LEDIOReplay("LED"));
 
         break;
     }

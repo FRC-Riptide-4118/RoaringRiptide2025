@@ -187,8 +187,13 @@ public class TunableArmFeedforward
    */
   public double calculate(
       double currentAngle, double currentVelocity, double nextVelocity, double dt) {
-    return ArmFeedforwardJNI.calculate(
-        ks, kv, ka, kg, currentAngle, currentVelocity, nextVelocity, dt);
+    // double num =
+    //     ArmFeedforwardJNI.calculate(
+    //         ks, kv, ka, kg, currentAngle, currentVelocity, nextVelocity, dt);
+
+    // System.out.println(num);
+
+    return calculate(currentAngle, currentVelocity, (nextVelocity - currentVelocity) / 2);
   }
 
   /**
