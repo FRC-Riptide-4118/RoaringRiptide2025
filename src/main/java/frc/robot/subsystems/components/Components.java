@@ -4,6 +4,7 @@ import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.subsystems.flywheel.Flywheel;
 import frc.robot.subsystems.position_joint.PositionJoint;
 import org.dyn4j.geometry.Rotation;
 import org.littletonrobotics.junction.Logger;
@@ -12,11 +13,17 @@ public class Components extends SubsystemBase {
   private final PositionJoint elevator;
   private final PositionJoint coralWrist;
   private final PositionJoint climber;
+  private final Flywheel algaeIntake;
 
-  public Components(PositionJoint elevator, PositionJoint coralWrist, PositionJoint climber) {
+  public Components(
+      PositionJoint elevator,
+      PositionJoint coralWrist,
+      PositionJoint climber,
+      Flywheel algaeIntake) {
     this.elevator = elevator;
     this.coralWrist = coralWrist;
     this.climber = climber;
+    this.algaeIntake = algaeIntake;
   }
 
   @Override
