@@ -33,6 +33,11 @@ import frc.robot.subsystems.drive.drive_motor.DriveMotorIOSparkMax;
 import frc.robot.subsystems.drive.gyro.GyroIO;
 import frc.robot.subsystems.drive.gyro.GyroIOPigeon2SparkThread;
 import frc.robot.subsystems.drive.odometry_threads.SparkOdometryThread;
+import frc.robot.subsystems.flywheel.Flywheel;
+import frc.robot.subsystems.flywheel.FlywheelConstants;
+import frc.robot.subsystems.flywheel.FlywheelIOReplay;
+import frc.robot.subsystems.flywheel.FlywheelIOSim;
+import frc.robot.subsystems.flywheel.FlywheelIOSparkMax;
 import frc.robot.subsystems.led.LED;
 import frc.robot.subsystems.led.LEDIOBlinkin;
 import frc.robot.subsystems.led.LEDIOReplay;
@@ -65,9 +70,9 @@ public class RobotContainer {
   @SuppressWarnings("unused")
   private final Vision vision;
 
-  //   private final Flywheel coralIntake;
+  private final Flywheel coralIntake;
 
-  //   private final Flywheel algaeIntake;
+  private final Flywheel algaeIntake;
 
   private final PositionJoint elevator;
 
@@ -167,15 +172,15 @@ public class RobotContainer {
                 new PositionJointIOSparkMax("Wrist", PositionJointConstants.WRIST_CONFIG),
                 PositionJointConstants.WRIST_GAINS);
 
-        // coralIntake =
-        //     new Flywheel(
-        //         new FlywheelIOSparkMax("Coral Intake", FlywheelConstants.CORAL_INTAKE_CONFIG),
-        //         FlywheelConstants.CORAL_INTAKE_GAINS);
+        coralIntake =
+            new Flywheel(
+                new FlywheelIOSparkMax("Coral Intake", FlywheelConstants.CORAL_INTAKE_CONFIG),
+                FlywheelConstants.CORAL_INTAKE_GAINS);
 
-        // algaeIntake =
-        //     new Flywheel(
-        //         new FlywheelIOSparkMax("Algae Intake", FlywheelConstants.ALGAE_INTAKE_CONFIG),
-        //         FlywheelConstants.ALGAE_INTAKE_GAINS);
+        algaeIntake =
+            new Flywheel(
+                new FlywheelIOSparkMax("Algae Intake", FlywheelConstants.ALGAE_INTAKE_CONFIG),
+                FlywheelConstants.ALGAE_INTAKE_GAINS);
 
         led = new LED(new LEDIOBlinkin("LED", 9));
         break;
@@ -225,15 +230,15 @@ public class RobotContainer {
                 new PositionJointIOSim("Wrist", PositionJointConstants.WRIST_CONFIG),
                 PositionJointConstants.WRIST_GAINS_SIM);
 
-        // coralIntake =
-        //     new Flywheel(
-        //         new FlywheelIOSim("Coral Intake", FlywheelConstants.CORAL_INTAKE_CONFIG),
-        //         FlywheelConstants.CORAL_INTAKE_GAINS_SIM);
+        coralIntake =
+            new Flywheel(
+                new FlywheelIOSim("Coral Intake", FlywheelConstants.CORAL_INTAKE_CONFIG),
+                FlywheelConstants.CORAL_INTAKE_GAINS_SIM);
 
-        // algaeIntake =
-        //     new Flywheel(
-        //         new FlywheelIOSim("Algae Intake", FlywheelConstants.ALGAE_INTAKE_CONFIG),
-        //         FlywheelConstants.ALGAE_INTAKE_GAINS_SIM);
+        algaeIntake =
+            new Flywheel(
+                new FlywheelIOSim("Algae Intake", FlywheelConstants.ALGAE_INTAKE_CONFIG),
+                FlywheelConstants.ALGAE_INTAKE_GAINS_SIM);
 
         led = new LED(new LEDIOReplay("LED"));
         break;
@@ -273,20 +278,20 @@ public class RobotContainer {
             new PositionJoint(
                 new PositionJointIOReplay("Wrist"), PositionJointConstants.WRIST_GAINS);
 
-        // coralIntake =
-        //     new Flywheel(
-        //         new FlywheelIOReplay("Coral Intake"), FlywheelConstants.CORAL_INTAKE_GAINS);
+        coralIntake =
+            new Flywheel(
+                new FlywheelIOReplay("Coral Intake"), FlywheelConstants.CORAL_INTAKE_GAINS);
 
-        // algaeIntake =
-        //     new Flywheel(
-        //         new FlywheelIOReplay("Algae Intake"), FlywheelConstants.ALGAE_INTAKE_GAINS);
+        algaeIntake =
+            new Flywheel(
+                new FlywheelIOReplay("Algae Intake"), FlywheelConstants.ALGAE_INTAKE_GAINS);
 
         led = new LED(new LEDIOReplay("LED"));
 
         break;
     }
 
-    simComponents = new Components(elevator, wrist, climber, algaeIntake);
+    simComponents = new Components(elevator, wrist, climber);
 
     // Set up auto routines
     autoChooser = new LoggedDashboardChooser<>("Auto Choices", AutoBuilder.buildAutoChooser());
