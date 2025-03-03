@@ -1,6 +1,7 @@
 package frc.robot;
 
 import com.pathplanner.lib.auto.AutoBuilder;
+import com.pathplanner.lib.auto.NamedCommands;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.DriverStation;
@@ -8,9 +9,15 @@ import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.ConditionalCommand;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.SelectCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandGenericHID;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+import edu.wpi.first.wpilibj2.command.button.Trigger;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
+import frc.robot.commands.CoralCommands;
+import frc.robot.commands.CoralPresets;
 import frc.robot.commands.DriveCommands;
 import frc.robot.subsystems.components.Components;
 import frc.robot.subsystems.drive.Drive;
@@ -39,8 +46,11 @@ import frc.robot.subsystems.vision.VisionConstants;
 import frc.robot.subsystems.vision.VisionIO;
 import frc.robot.subsystems.vision.VisionIOPhotonVisionSim;
 import frc.robot.subsystems.vision.VisionIOPhotonVisionTrig;
+import frc.robot.util.pathplanner.AllianceUtil;
+import java.util.Map;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 import org.littletonrobotics.junction.networktables.LoggedNetworkBoolean;
+import org.littletonrobotics.junction.networktables.LoggedNetworkString;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -77,7 +87,23 @@ public class RobotContainer {
   // Dashboard inputs
   private final LoggedDashboardChooser<Command> autoChooser;
 
-  private final LoggedNetworkBoolean zeroButton;
+  private final LoggedNetworkBoolean abChooser;
+  private final LoggedNetworkBoolean cdChooser;
+  private final LoggedNetworkBoolean efChooser;
+  private final LoggedNetworkBoolean ghChooser;
+  private final LoggedNetworkBoolean ijChooser;
+  private final LoggedNetworkBoolean klChooser;
+
+  private final LoggedNetworkBoolean leftChooser;
+  private final LoggedNetworkBoolean rightChooser;
+
+  private final LoggedNetworkBoolean l1Chooser;
+  private final LoggedNetworkBoolean l2Chooser;
+  private final LoggedNetworkBoolean l3Chooser;
+  private final LoggedNetworkBoolean l4Chooser;
+
+  private final LoggedNetworkString reefStateIndicator;
+  private final LoggedNetworkString coralLevelIndicator;
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
@@ -281,9 +307,27 @@ public class RobotContainer {
     autoChooser.addOption(
         "Drive SysId (Dynamic Reverse)", drive.sysIdDynamic(SysIdRoutine.Direction.kReverse));
 
-    zeroButton = new LoggedNetworkBoolean("CoralChoosers/ZeroChooser", false);
+    abChooser = new LoggedNetworkBoolean("CoralChoosers/ABChooser", false);
+    cdChooser = new LoggedNetworkBoolean("CoralChoosers/CDChooser", false);
+    efChooser = new LoggedNetworkBoolean("CoralChoosers/EFChooser", false);
+    ghChooser = new LoggedNetworkBoolean("CoralChoosers/GHChooser", false);
+    ijChooser = new LoggedNetworkBoolean("CoralChoosers/IJChooser", false);
+    klChooser = new LoggedNetworkBoolean("CoralChoosers/KLChooser", false);
+
+    reefStateIndicator = new LoggedNetworkString("CoralChoosers/ReefStateIndicator", "None");
+    coralLevelIndicator = new LoggedNetworkString("CoralChoosers/CoralLevelIndicator", "None");
+
+    leftChooser = new LoggedNetworkBoolean("CoralChoosers/LeftChooser", false);
+    rightChooser = new LoggedNetworkBoolean("CoralChoosers/RightChooser", false);
+
+    l1Chooser = new LoggedNetworkBoolean("CoralChoosers/L1Chooser", false);
+    l2Chooser = new LoggedNetworkBoolean("CoralChoosers/L2Chooser", false);
+    l3Chooser = new LoggedNetworkBoolean("CoralChoosers/L3Chooser", false);
+    l4Chooser = new LoggedNetworkBoolean("CoralChoosers/L4Chooser", false);
 
     // Configure the button bindings
+    registerNamedCommands();
+
     configureButtonBindings();
   }
 
@@ -302,16 +346,6 @@ public class RobotContainer {
             () -> -driverController.getLeftY(),
             () -> -driverController.getLeftX(),
             () -> -driverController.getRightX()));
-
-    // Lock to 0° when A button is held
-    driverController
-        .a()
-        .whileTrue(
-            DriveCommands.joystickDriveAtAngle(
-                drive,
-                () -> -driverController.getLeftY(),
-                () -> -driverController.getLeftX(),
-                () -> new Rotation2d()));
 
     // Switch to X pattern when X button is pressed
     driverController.x().onTrue(Commands.runOnce(drive::stopWithX, drive));
@@ -337,16 +371,306 @@ public class RobotContainer {
     //     .or(new Trigger(zeroButton::get))
     //     .onTrue(CoralCommands.CoralPresetCommand(elevator, wrist, CoralPresets.ZERO));
 
+    operatorController.povDown().onTrue(new InstantCommand(() -> abChooser.set(true)));
+    operatorController.povDownRight().onTrue(new InstantCommand(() -> cdChooser.set(true)));
+    operatorController.povUpRight().onTrue(new InstantCommand(() -> efChooser.set(true)));
+    operatorController.povUp().onTrue(new InstantCommand(() -> ghChooser.set(true)));
+    operatorController.povUpLeft().onTrue(new InstantCommand(() -> ijChooser.set(true)));
+    operatorController.povDownLeft().onTrue(new InstantCommand(() -> klChooser.set(true)));
+
     operatorController
-        .povDown()
+        .button(3)
         .onTrue(
-            DriveCommands.joystickDriveAlongTrajectory(
-                    drive,
-                    "LeftHPToB",
-                    () -> -driverController.getLeftY(),
-                    () -> -driverController.getLeftX(),
-                    () -> -driverController.getRightX())
-                .andThen(DriveCommands.driveToReef("B")));
+            new InstantCommand(
+                () -> {
+                  l1Chooser.set(true);
+                  l2Chooser.set(false);
+                  l3Chooser.set(false);
+                  l4Chooser.set(false);
+
+                  //   if (elevator.getCurrentCommand() != null) {
+                  //     elevator.getCurrentCommand().cancel();
+                  //   }
+
+                  //   if (wrist.getCurrentCommand() != null) {
+                  //     wrist.getCurrentCommand().cancel();
+                  //   }
+                }))
+        .onTrue(new InstantCommand(() -> coralLevelIndicator.set("L1")));
+
+    operatorController
+        .button(4)
+        .onTrue(
+            new InstantCommand(
+                () -> {
+                  l1Chooser.set(false);
+                  l2Chooser.set(true);
+                  l3Chooser.set(false);
+                  l4Chooser.set(false);
+
+                  //   if (elevator.getCurrentCommand() != null) {
+                  //     elevator.getCurrentCommand().cancel();
+                  //   }
+
+                  //   if (wrist.getCurrentCommand() != null) {
+                  //     wrist.getCurrentCommand().cancel();
+                  //   }
+                }))
+        .onTrue(new InstantCommand(() -> coralLevelIndicator.set("L2")));
+
+    operatorController
+        .button(5)
+        .onTrue(
+            new InstantCommand(
+                () -> {
+                  l1Chooser.set(false);
+                  l2Chooser.set(false);
+                  l3Chooser.set(true);
+                  l4Chooser.set(false);
+
+                  //   if (elevator.getCurrentCommand() != null) {
+                  //     elevator.getCurrentCommand().cancel();
+                  //   }
+
+                  //   if (wrist.getCurrentCommand() != null) {
+                  //     wrist.getCurrentCommand().cancel();
+                  //   }
+                }))
+        .onTrue(new InstantCommand(() -> coralLevelIndicator.set("L3")));
+
+    operatorController
+        .button(6)
+        .onTrue(
+            new InstantCommand(
+                () -> {
+                  l1Chooser.set(false);
+                  l2Chooser.set(false);
+                  l3Chooser.set(false);
+                  l4Chooser.set(true);
+
+                  //   if (elevator.getCurrentCommand() != null) {
+                  //     elevator.getCurrentCommand().cancel();
+                  //   }
+
+                  //   if (wrist.getCurrentCommand() != null) {
+                  //     wrist.getCurrentCommand().cancel();
+                  //   }
+                }))
+        .onTrue(new InstantCommand(() -> coralLevelIndicator.set("L4")));
+
+    new Trigger(abChooser::get)
+        .onTrue(
+            new InstantCommand(
+                () -> {
+                  cdChooser.set(false);
+                  efChooser.set(false);
+                  ghChooser.set(false);
+                  ijChooser.set(false);
+                  klChooser.set(false);
+                }))
+        .onTrue(
+            new ConditionalCommand(
+                new InstantCommand(() -> reefStateIndicator.set("A")),
+                new InstantCommand(() -> reefStateIndicator.set("B")),
+                leftChooser::get));
+
+    new Trigger(cdChooser::get)
+        .onTrue(
+            new InstantCommand(
+                () -> {
+                  abChooser.set(false);
+                  efChooser.set(false);
+                  ghChooser.set(false);
+                  ijChooser.set(false);
+                  klChooser.set(false);
+                }))
+        .onTrue(
+            new ConditionalCommand(
+                new InstantCommand(() -> reefStateIndicator.set("C")),
+                new InstantCommand(() -> reefStateIndicator.set("D")),
+                leftChooser::get));
+
+    new Trigger(efChooser::get)
+        .onTrue(
+            new InstantCommand(
+                () -> {
+                  abChooser.set(false);
+                  cdChooser.set(false);
+                  ghChooser.set(false);
+                  ijChooser.set(false);
+                  klChooser.set(false);
+                }))
+        .onTrue(
+            new ConditionalCommand(
+                new InstantCommand(() -> reefStateIndicator.set("E")),
+                new InstantCommand(() -> reefStateIndicator.set("F")),
+                leftChooser::get));
+
+    new Trigger(ghChooser::get)
+        .onTrue(
+            new InstantCommand(
+                () -> {
+                  abChooser.set(false);
+                  cdChooser.set(false);
+                  efChooser.set(false);
+                  ijChooser.set(false);
+                  klChooser.set(false);
+                }))
+        .onTrue(
+            new ConditionalCommand(
+                new InstantCommand(() -> reefStateIndicator.set("G")),
+                new InstantCommand(() -> reefStateIndicator.set("H")),
+                leftChooser::get));
+
+    new Trigger(ijChooser::get)
+        .onTrue(
+            new InstantCommand(
+                () -> {
+                  abChooser.set(false);
+                  cdChooser.set(false);
+                  efChooser.set(false);
+                  ghChooser.set(false);
+                  klChooser.set(false);
+                }))
+        .onTrue(
+            new ConditionalCommand(
+                new InstantCommand(() -> reefStateIndicator.set("I")),
+                new InstantCommand(() -> reefStateIndicator.set("J")),
+                leftChooser::get));
+
+    new Trigger(klChooser::get)
+        .onTrue(
+            new InstantCommand(
+                () -> {
+                  abChooser.set(false);
+                  cdChooser.set(false);
+                  efChooser.set(false);
+                  ghChooser.set(false);
+                  ijChooser.set(false);
+                }))
+        .onTrue(
+            new ConditionalCommand(
+                new InstantCommand(() -> reefStateIndicator.set("K")),
+                new InstantCommand(() -> reefStateIndicator.set("L")),
+                leftChooser::get));
+
+    operatorController
+        .button(1)
+        .onTrue(
+            new InstantCommand(
+                () -> {
+                  leftChooser.set(true);
+                  rightChooser.set(false);
+                }));
+
+    operatorController
+        .button(2)
+        .onTrue(
+            new InstantCommand(
+                () -> {
+                  leftChooser.set(false);
+                  rightChooser.set(true);
+                }));
+
+    new Trigger(abChooser::get)
+        .onTrue(
+            DriveCommands.joystickDriveAtAngle(
+                drive,
+                () -> -driverController.getLeftY(),
+                () -> -driverController.getLeftX(),
+                () -> AllianceUtil.flipRotation2dAlliance(Rotation2d.fromDegrees(0))))
+        .and(driverController.a())
+        .whileTrue(
+            new ConditionalCommand(
+                DriveCommands.driveToReef(drive, "A"),
+                DriveCommands.driveToReef(drive, "B"),
+                leftChooser::get));
+
+    new Trigger(cdChooser::get)
+        .onTrue(
+            DriveCommands.joystickDriveAtAngle(
+                drive,
+                () -> -driverController.getLeftY(),
+                () -> -driverController.getLeftX(),
+                () -> AllianceUtil.flipRotation2dAlliance(Rotation2d.fromDegrees(60))))
+        .and(driverController.a())
+        .whileTrue(
+            new ConditionalCommand(
+                DriveCommands.driveToReef(drive, "C"),
+                DriveCommands.driveToReef(drive, "D"),
+                leftChooser::get));
+
+    new Trigger(efChooser::get)
+        .onTrue(
+            DriveCommands.joystickDriveAtAngle(
+                drive,
+                () -> -driverController.getLeftY(),
+                () -> -driverController.getLeftX(),
+                () -> AllianceUtil.flipRotation2dAlliance(Rotation2d.fromDegrees(120))))
+        .and(driverController.a())
+        .whileTrue(
+            new ConditionalCommand(
+                DriveCommands.driveToReef(drive, "E"),
+                DriveCommands.driveToReef(drive, "F"),
+                leftChooser::get));
+
+    new Trigger(ghChooser::get)
+        .onTrue(
+            DriveCommands.joystickDriveAtAngle(
+                drive,
+                () -> -driverController.getLeftY(),
+                () -> -driverController.getLeftX(),
+                () -> AllianceUtil.flipRotation2dAlliance(Rotation2d.fromDegrees(180))))
+        .and(driverController.a())
+        .whileTrue(
+            new ConditionalCommand(
+                DriveCommands.driveToReef(drive, "G"),
+                DriveCommands.driveToReef(drive, "H"),
+                leftChooser::get));
+
+    new Trigger(ijChooser::get)
+        .onTrue(
+            DriveCommands.joystickDriveAtAngle(
+                drive,
+                () -> -driverController.getLeftY(),
+                () -> -driverController.getLeftX(),
+                () -> AllianceUtil.flipRotation2dAlliance(Rotation2d.fromDegrees(-120))))
+        .and(driverController.a())
+        .whileTrue(
+            new ConditionalCommand(
+                DriveCommands.driveToReef(drive, "I"),
+                DriveCommands.driveToReef(drive, "J"),
+                leftChooser::get));
+
+    new Trigger(klChooser::get)
+        .onTrue(
+            DriveCommands.joystickDriveAtAngle(
+                drive,
+                () -> -driverController.getLeftY(),
+                () -> -driverController.getLeftX(),
+                () -> AllianceUtil.flipRotation2dAlliance(Rotation2d.fromDegrees(-60))))
+        .and(driverController.a())
+        .whileTrue(
+            new ConditionalCommand(
+                DriveCommands.driveToReef(drive, "K"),
+                DriveCommands.driveToReef(drive, "L"),
+                leftChooser::get));
+  }
+
+  public void registerNamedCommands() {
+    NamedCommands.registerCommand(
+        "CoralPreset",
+        new SelectCommand<String>(
+            Map.of(
+                "L1",
+                CoralCommands.CoralPresetCommand(elevator, wrist, CoralPresets.L1),
+                "L2",
+                CoralCommands.CoralPresetCommand(elevator, wrist, CoralPresets.L2),
+                "L3",
+                CoralCommands.CoralPresetCommand(elevator, wrist, CoralPresets.L3),
+                "L4",
+                CoralCommands.CoralPresetCommand(elevator, wrist, CoralPresets.L4)),
+            coralLevelIndicator::get));
   }
 
   /**

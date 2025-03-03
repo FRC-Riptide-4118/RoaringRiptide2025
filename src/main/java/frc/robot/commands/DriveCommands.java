@@ -283,7 +283,7 @@ public class DriveCommands {
         .beforeStarting(() -> angleController.reset(drive.getRotation().getRadians()));
   }
 
-  public static Command driveToReef(String path) {
+  public static Command driveToReef(Drive drive, String path) {
     try {
       return AutoBuilder.pathfindThenFollowPath(
           PathPlannerPath.fromPathFile(path), AutoDrivePresets.CONSTRAINTS);

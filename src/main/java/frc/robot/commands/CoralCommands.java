@@ -1,6 +1,7 @@
 package frc.robot.commands;
 
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import frc.robot.commands.position_joint.PositionJointPositionCommand;
 import frc.robot.subsystems.position_joint.PositionJoint;
@@ -14,9 +15,20 @@ public class CoralCommands {
       PositionJoint wrist,
       DoubleSupplier wristPos) {
 
-    return new ParallelCommandGroup(
-        new PositionJointPositionCommand(wrist, wristPos),
-        new PositionJointPositionCommand(elevator, elevatorPos));
+    return new InstantCommand(
+            () -> {
+              // if (elevator.getCurrentCommand() != null) {
+              //   elevator.getCurrentCommand().cancel();
+              // }
+
+              // if (wrist.getCurrentCommand() != null) {
+              //   wrist.getCurrentCommand().cancel();
+              // }
+            })
+        .andThen(
+            new ParallelCommandGroup(
+                new PositionJointPositionCommand(wrist, wristPos),
+                new PositionJointPositionCommand(elevator, elevatorPos)));
   }
 
   public static Command CoralPresetCommand(
