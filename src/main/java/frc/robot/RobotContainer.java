@@ -67,20 +67,20 @@ public class RobotContainer {
   // Subsystems
   private final Drive drive;
 
-  @SuppressWarnings("unused")
-  private final Vision vision;
-
   private final Flywheel coralIntake;
 
   private final Flywheel algaeIntake;
+
+  private final LED led;
+
+  @SuppressWarnings("unused")
+  private final Vision vision;
 
   private final PositionJoint elevator;
 
   private final PositionJoint climber;
 
   private final PositionJoint wrist;
-
-  private final LED led;
 
   @SuppressWarnings("unused")
   private final Components simComponents;
@@ -370,6 +370,24 @@ public class RobotContainer {
 
     // Reset gyro to 0° when B button is pressed
     driverController.b().onTrue(Commands.runOnce(resetGyro, drive).ignoringDisable(true));
+
+    // Algae
+    driverController
+        .rightTrigger()
+        .onTrue(new InstantCommand(() -> algaeIntake.setVoltage(6.0), algaeIntake));
+
+    // Runnable runAlgaeIntake = () -> algaeIntake.setVoltage(driverController.right);
+
+    // Coral
+
+    driverController
+        .leftTrigger()
+        .onTrue(
+            new InstantCommand(
+                () -> {
+                  coralIntake.setVoltage(6.0);
+                },
+                coralIntake));
 
     // operatorController
     //     .button(1)
