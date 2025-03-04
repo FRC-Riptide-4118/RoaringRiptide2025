@@ -65,7 +65,7 @@ public class PositionJointConstants {
           "");
 
   public static final PositionJointGains WRIST_GAINS =
-      new PositionJointGains(0, 0, 0, 0, 0, 0.5, 0, 0.1, 0.1, -0.18, 0.15, 0, 0);
+      new PositionJointGains(0.3, 0, 0, 0, 0.5, 2.0, 0, 0.5, 0.5, -0.1, 0.286, 0, 0);
 
   public static final PositionJointGains WRIST_GAINS_SIM =
       new PositionJointGains(0, 0, 0, 0, 0, 0.0, 0, 0.0, 0.0, 0.0, 1.0, 0, 0);
