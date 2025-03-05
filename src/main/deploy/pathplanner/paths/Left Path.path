@@ -3,45 +3,29 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 5.414573863636364,
-        "y": 3.0328267045454544
+        "x": 7.126055463574292,
+        "y": 2.4486961920554235
       },
       "prevControl": null,
       "nextControl": {
-        "x": 5.6674416041157585,
-        "y": 3.2101080679585614
-      },
-      "isLocked": false,
-      "linkedName": "FEnd"
-    },
-    {
-      "anchor": {
-        "x": 3.8590056818181817,
-        "y": 2.384673295454545
-      },
-      "prevControl": {
-        "x": 4.603932359776316,
-        "y": 2.168285086324772
-      },
-      "nextControl": {
-        "x": 2.4490306767741203,
-        "y": 2.794246445788644
+        "x": 6.7735571167127215,
+        "y": 2.285790154620855
       },
       "isLocked": false,
       "linkedName": null
     },
     {
       "anchor": {
-        "x": 1.2065624999999998,
-        "y": 7.031434659090909
+        "x": 5.339093543046357,
+        "y": 2.5867135761589397
       },
       "prevControl": {
-        "x": 1.2238662945662255,
-        "y": 7.280835097529998
+        "x": 5.581358491854073,
+        "y": 2.648420095905194
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": "LeftHP"
+      "linkedName": null
     }
   ],
   "rotationTargets": [],
@@ -58,13 +42,13 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": 125.00000000000001
+    "rotation": 118.81079374302587
   },
   "reversed": false,
-  "folder": "FromLeftHP",
+  "folder": "Reef",
   "idealStartingState": {
     "velocity": 0,
-    "rotation": 119.99999999999999
+    "rotation": 180.0
   },
   "useDefaultConstraints": true
 }

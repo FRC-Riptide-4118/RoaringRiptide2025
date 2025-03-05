@@ -73,8 +73,7 @@ public class FlywheelIOSparkMax implements FlywheelIO {
       motors[i] = new SparkMax(config.canIds()[i], MotorType.kBrushless);
       motors[i].configure(
           new SparkMaxConfig()
-              .follow(motors[0])
-              .inverted(config.reversed()[i])
+              .follow(motors[0], config.reversed()[i])
               .smartCurrentLimit(config.currentLimit()),
           ResetMode.kNoResetSafeParameters,
           PersistMode.kNoPersistParameters);
