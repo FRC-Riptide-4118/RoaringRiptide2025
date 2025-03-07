@@ -19,7 +19,6 @@ import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.commands.CoralCommands;
 import frc.robot.commands.CoralPresets;
 import frc.robot.commands.DriveCommands;
-import frc.robot.commands.flywheel.FlywheelVoltageCommand;
 import frc.robot.subsystems.components.Components;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.drive.Module;
@@ -111,8 +110,6 @@ public class RobotContainer {
   private final LoggedNetworkString reefStateIndicator;
   private final LoggedNetworkString coralLevelIndicator;
 
-  private final LoggedNetworkBoolean manualMode;
-
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
     switch (Constants.currentMode) {
@@ -151,6 +148,10 @@ public class RobotContainer {
         vision =
             new Vision(
                 drive::addVisionMeasurement,
+                new VisionIOPhotonVisionTrig(
+                    VisionConstants.camera0Name,
+                    VisionConstants.robotToCamera0,
+                    drive::getRotation),
                 new VisionIOPhotonVisionTrig(
                     VisionConstants.camera1Name,
                     VisionConstants.robotToCamera1,
@@ -292,8 +293,6 @@ public class RobotContainer {
 
     simComponents = new Components(elevator, wrist, climber);
 
-    registerNamedCommands();
-
     // Set up auto routines
     autoChooser = new LoggedDashboardChooser<>("Auto Choices", AutoBuilder.buildAutoChooser());
 
@@ -331,9 +330,8 @@ public class RobotContainer {
     l3Chooser = new LoggedNetworkBoolean("CoralChoosers/L3Chooser", false);
     l4Chooser = new LoggedNetworkBoolean("CoralChoosers/L4Chooser", false);
 
-    manualMode = new LoggedNetworkBoolean("CoralChoosers/ManualMode", false);
-
     // Configure the button bindings
+    registerNamedCommands();
 
     configureButtonBindings();
   }
@@ -354,38 +352,8 @@ public class RobotContainer {
             () -> -driverController.getLeftX(),
             () -> -driverController.getRightX()));
 
-    // Coral
-    // Goes at -1 volt constantly to keep coral inside
-    coralIntake.setDefaultCommand(
-        new FlywheelVoltageCommand(
-            coralIntake,
-            () ->
-                6.0
-                    * (driverController.getLeftTriggerAxis()
-                        - driverController.getRightTriggerAxis()
-                        - 0.25)));
-
-    // Algae
-    algaeIntake.setDefaultCommand(
-        new FlywheelVoltageCommand(
-            algaeIntake,
-            () ->
-                driverController.leftBumper().getAsBoolean()
-                    ? -6.0
-                    : driverController.rightBumper().getAsBoolean() ? 6.0 : 0.0));
-
     // Switch to X pattern when X button is pressed
     driverController.x().onTrue(Commands.runOnce(drive::stopWithX, drive));
-
-    operatorController
-        .button(8)
-        .whileTrue(Commands.run(() -> climber.setVoltage(6.0)))
-        .onFalse(new InstantCommand(() -> climber.setVoltage(0.0)));
-
-    operatorController
-        .button(7)
-        .whileTrue(Commands.run(() -> climber.setVoltage(-6.0)))
-        .onFalse(new InstantCommand(() -> climber.setVoltage(0.0)));
 
     // driverController.y().whileTrue(DriveCommands.driveToReef());
     // // Reset gyro / odometry
@@ -404,11 +372,22 @@ public class RobotContainer {
     driverController.b().onTrue(Commands.runOnce(resetGyro, drive).ignoringDisable(true));
 
     // Algae
-    // driverController
-    //     .rightTrigger()
-    //     .onTrue(new InstantCommand(() -> algaeIntake.setVoltage(6.0), algaeIntake));
+    driverController
+        .rightTrigger()
+        .onTrue(new InstantCommand(() -> algaeIntake.setVoltage(6.0), algaeIntake));
 
     // Runnable runAlgaeIntake = () -> algaeIntake.setVoltage(driverController.right);
+
+    // Coral
+
+    driverController
+        .leftTrigger()
+        .onTrue(
+            new InstantCommand(
+                () -> {
+                  coralIntake.setVoltage(6.0);
+                },
+                coralIntake));
 
     // operatorController
     //     .button(1)
@@ -423,7 +402,7 @@ public class RobotContainer {
     operatorController.povDownLeft().onTrue(new InstantCommand(() -> klChooser.set(true)));
 
     operatorController
-        .button(5)
+        .button(3)
         .onTrue(
             new InstantCommand(
                 () -> {
@@ -443,7 +422,7 @@ public class RobotContainer {
         .onTrue(new InstantCommand(() -> coralLevelIndicator.set("L1")));
 
     operatorController
-        .button(3)
+        .button(4)
         .onTrue(
             new InstantCommand(
                 () -> {
@@ -463,7 +442,7 @@ public class RobotContainer {
         .onTrue(new InstantCommand(() -> coralLevelIndicator.set("L2")));
 
     operatorController
-        .button(4)
+        .button(5)
         .onTrue(
             new InstantCommand(
                 () -> {
@@ -501,16 +480,6 @@ public class RobotContainer {
                   //   }
                 }))
         .onTrue(new InstantCommand(() -> coralLevelIndicator.set("L4")));
-
-    operatorController
-        .button(10)
-        .onTrue(new InstantCommand(() -> manualMode.set(true)))
-        .onFalse(new InstantCommand(() -> manualMode.set(false)));
-
-    operatorController.button(9).onTrue(new InstantCommand(() -> coralLevelIndicator.set("Zero")));
-
-    new Trigger(() -> operatorController.getRawAxis(2) > 0.5)
-        .onTrue(new InstantCommand(() -> coralLevelIndicator.set("Human Player")));
 
     new Trigger(abChooser::get)
         .onTrue(
@@ -709,43 +678,22 @@ public class RobotContainer {
                 DriveCommands.driveToReef(drive, "K"),
                 DriveCommands.driveToReef(drive, "L"),
                 leftChooser::get));
-
-    new Trigger(manualMode::get)
-        .whileTrue(
-            new SelectCommand<String>(
-                Map.of(
-                    "L1",
-                    CoralCommands.CoralPresetCommand(elevator, wrist, CoralPresets.L1),
-                    "L2",
-                    CoralCommands.CoralPresetCommand(elevator, wrist, CoralPresets.L2),
-                    "L3",
-                    CoralCommands.CoralPresetCommand(elevator, wrist, CoralPresets.L3),
-                    "L4",
-                    CoralCommands.CoralPresetCommand(elevator, wrist, CoralPresets.L4),
-                    "Human Player",
-                    CoralCommands.CoralPresetCommand(elevator, wrist, CoralPresets.HUMAN_PLAYER),
-                    "Zero",
-                    CoralCommands.CoralPresetCommand(elevator, wrist, CoralPresets.ZERO)),
-                coralLevelIndicator::get));
   }
 
   public void registerNamedCommands() {
-    // NamedCommands.registerCommand(
-    //     "CoralPreset",
-    //     new SelectCommand<String>(
-    //         Map.of(
-    //             "L1",
-    //             CoralCommands.CoralPresetCommand(elevator, wrist, CoralPresets.L1),
-    //             "L2",
-    //             CoralCommands.CoralPresetCommand(elevator, wrist, CoralPresets.L2),
-    //             "L3",
-    //             CoralCommands.CoralPresetCommand(elevator, wrist, CoralPresets.L3),
-    //             "L4",
-    //             CoralCommands.CoralPresetCommand(elevator, wrist, CoralPresets.L4)),
-    //         coralLevelIndicator::get));
-
     NamedCommands.registerCommand(
-        "L4", CoralCommands.CoralPresetCommand(elevator, wrist, CoralPresets.L4).withName("L4"));
+        "CoralPreset",
+        new SelectCommand<String>(
+            Map.of(
+                "L1",
+                CoralCommands.CoralPresetCommand(elevator, wrist, CoralPresets.L1),
+                "L2",
+                CoralCommands.CoralPresetCommand(elevator, wrist, CoralPresets.L2),
+                "L3",
+                CoralCommands.CoralPresetCommand(elevator, wrist, CoralPresets.L3),
+                "L4",
+                CoralCommands.CoralPresetCommand(elevator, wrist, CoralPresets.L4)),
+            coralLevelIndicator::get));
   }
 
   /**

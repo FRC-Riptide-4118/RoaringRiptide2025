@@ -47,7 +47,7 @@ public class PositionJointConstants {
       String canBus) {}
 
   public static final PositionJointGains ELEVATOR_GAINS =
-      new PositionJointGains(0.8, 0.0, 0, 0.13, 0.7, 4.0, 0.0, 3.0, 3.0, 0.0, 1.3, 0.0, 0.0);
+      new PositionJointGains(0.0, 0.0, 0, 0.0, 0.0, 0.0, 0.0, 2.0, 2.0, 0.0, 1.0, 0.0, 0.0);
 
   public static final PositionJointGains ELEVATOR_GAINS_SIM =
       new PositionJointGains(0.0, 0.0, 0, 0.0, 0.0, 1.0, 0.0, 0.5, 0.5, 0.0, 1.0, 0.0, 0.0);
@@ -65,7 +65,7 @@ public class PositionJointConstants {
           "");
 
   public static final PositionJointGains WRIST_GAINS =
-      new PositionJointGains(2.0, 0, 0, 0, 0.7, 1.0, 0, 3.0, 3.0, -0.1, 0.286, 0, 0);
+      new PositionJointGains(0.3, 0, 0, 0, 0.5, 2.0, 0, 0.5, 0.5, -0.1, 0.286, 0, 0);
 
   public static final PositionJointGains WRIST_GAINS_SIM =
       new PositionJointGains(0, 0, 0, 0, 0, 0.0, 0, 0.0, 0.0, 0.0, 1.0, 0, 0);
@@ -93,7 +93,7 @@ public class PositionJointConstants {
           new int[] {21, 22},
           new boolean[] {false, true},
           36.0 / 1.0,
-          80,
+          40,
           GravityType.COSINE,
           EncoderType.INTERNAL,
           -1,

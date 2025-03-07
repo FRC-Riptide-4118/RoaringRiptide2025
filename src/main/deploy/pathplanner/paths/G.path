@@ -8,8 +8,8 @@
       },
       "prevControl": null,
       "nextControl": {
-        "x": 6.4057468768389825,
-        "y": 4.029247966028953
+        "x": 6.4509090927050625,
+        "y": 4.03001576186286
       },
       "isLocked": false,
       "linkedName": "GStart"
@@ -20,8 +20,8 @@
         "y": 4.029985795454545
       },
       "prevControl": {
-        "x": 6.069678242293665,
-        "y": 4.025946093181854
+        "x": 6.043494301836464,
+        "y": 4.02989539259816
       },
       "nextControl": null,
       "isLocked": false,
@@ -34,26 +34,26 @@
   "eventMarkers": [
     {
       "name": "CoralPreset",
-      "waypointRelativePos": 0.0,
+      "waypointRelativePos": 0,
       "endWaypointRelativePos": null,
       "command": {
         "type": "named",
         "data": {
-          "name": "L4"
+          "name": "CoralPreset"
         }
       }
     }
   ],
   "globalConstraints": {
-    "maxVelocity": 2.0,
-    "maxAcceleration": 1.0,
+    "maxVelocity": 4.0,
+    "maxAcceleration": 3.0,
     "maxAngularVelocity": 540.0,
     "maxAngularAcceleration": 720.0,
     "nominalVoltage": 12.0,
     "unlimited": false
   },
   "goalEndState": {
-    "velocity": 0.0,
+    "velocity": 1.0,
     "rotation": 180.0
   },
   "reversed": false,
