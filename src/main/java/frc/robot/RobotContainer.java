@@ -71,6 +71,12 @@ public class RobotContainer {
 
   private final Flywheel algaeIntake;
 
+  @SuppressWarnings("unused")
+  private final CommandXboxController driverController = new CommandXboxController(0);
+
+  private final CommandGenericHID operatorController = new CommandGenericHID(1);
+
+  @SuppressWarnings("unused")
   private final LED led;
 
   @SuppressWarnings("unused")
@@ -84,10 +90,6 @@ public class RobotContainer {
 
   @SuppressWarnings("unused")
   private final Components simComponents;
-
-  // Controller
-  private final CommandXboxController driverController = new CommandXboxController(0);
-  private final CommandGenericHID operatorController = new CommandGenericHID(1);
 
   // Dashboard inputs
   private final LoggedDashboardChooser<Command> autoChooser;
