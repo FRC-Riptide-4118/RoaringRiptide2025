@@ -9,7 +9,6 @@ import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
-import edu.wpi.first.wpilibj2.command.ConditionalCommand;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SelectCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandGenericHID;
@@ -52,7 +51,6 @@ import frc.robot.subsystems.vision.VisionConstants;
 import frc.robot.subsystems.vision.VisionIO;
 import frc.robot.subsystems.vision.VisionIOPhotonVisionSim;
 import frc.robot.subsystems.vision.VisionIOPhotonVisionTrig;
-import frc.robot.util.pathplanner.AllianceUtil;
 import java.util.Map;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 import org.littletonrobotics.junction.networktables.LoggedNetworkBoolean;
@@ -72,6 +70,7 @@ public class RobotContainer {
 
   private final Flywheel algaeIntake;
 
+  @SuppressWarnings("unused")
   private final LED led;
 
   @SuppressWarnings("unused")
@@ -209,8 +208,8 @@ public class RobotContainer {
         vision =
             new Vision(
                 drive::addVisionMeasurement,
-                new VisionIOPhotonVisionSim(
-                    VisionConstants.camera0Name, VisionConstants.robotToCamera0, drive::getPose),
+                // new VisionIOPhotonVisionSim(
+                // VisionConstants.camera0Name, VisionConstants.robotToCamera0, drive::getPose),
                 new VisionIOPhotonVisionSim(
                     VisionConstants.camera1Name, VisionConstants.robotToCamera1, drive::getPose));
 
@@ -403,24 +402,12 @@ public class RobotContainer {
     // Reset gyro to 0° when B button is pressed
     driverController.b().onTrue(Commands.runOnce(resetGyro, drive).ignoringDisable(true));
 
-    // Algae
-    // driverController
-    //     .rightTrigger()
-    //     .onTrue(new InstantCommand(() -> algaeIntake.setVoltage(6.0), algaeIntake));
-
-    // Runnable runAlgaeIntake = () -> algaeIntake.setVoltage(driverController.right);
-
-    // operatorController
-    //     .button(1)
-    //     .or(new Trigger(zeroButton::get))
-    //     .onTrue(CoralCommands.CoralPresetCommand(elevator, wrist, CoralPresets.ZERO));
-
-    operatorController.povDown().onTrue(new InstantCommand(() -> abChooser.set(true)));
-    operatorController.povDownRight().onTrue(new InstantCommand(() -> cdChooser.set(true)));
-    operatorController.povUpRight().onTrue(new InstantCommand(() -> efChooser.set(true)));
-    operatorController.povUp().onTrue(new InstantCommand(() -> ghChooser.set(true)));
-    operatorController.povUpLeft().onTrue(new InstantCommand(() -> ijChooser.set(true)));
-    operatorController.povDownLeft().onTrue(new InstantCommand(() -> klChooser.set(true)));
+    // operatorController.povDown().onTrue(new InstantCommand(() -> abChooser.set(true)));
+    // operatorController.povDownRight().onTrue(new InstantCommand(() -> cdChooser.set(true)));
+    // operatorController.povUpRight().onTrue(new InstantCommand(() -> efChooser.set(true)));
+    // operatorController.povUp().onTrue(new InstantCommand(() -> ghChooser.set(true)));
+    // operatorController.povUpLeft().onTrue(new InstantCommand(() -> ijChooser.set(true)));
+    // operatorController.povDownLeft().onTrue(new InstantCommand(() -> klChooser.set(true)));
 
     operatorController
         .button(5)
@@ -512,203 +499,203 @@ public class RobotContainer {
     new Trigger(() -> operatorController.getRawAxis(2) > 0.5)
         .onTrue(new InstantCommand(() -> coralLevelIndicator.set("Human Player")));
 
-    new Trigger(abChooser::get)
-        .onTrue(
-            new InstantCommand(
-                () -> {
-                  cdChooser.set(false);
-                  efChooser.set(false);
-                  ghChooser.set(false);
-                  ijChooser.set(false);
-                  klChooser.set(false);
-                }))
-        .onTrue(
-            new ConditionalCommand(
-                new InstantCommand(() -> reefStateIndicator.set("A")),
-                new InstantCommand(() -> reefStateIndicator.set("B")),
-                leftChooser::get));
+    // new Trigger(abChooser::get)
+    //     .onTrue(
+    //         new InstantCommand(
+    //             () -> {
+    //               cdChooser.set(false);
+    //               efChooser.set(false);
+    //               ghChooser.set(false);
+    //               ijChooser.set(false);
+    //               klChooser.set(false);
+    //             }))
+    //     .onTrue(
+    //         new ConditionalCommand(
+    //             new InstantCommand(() -> reefStateIndicator.set("A")),
+    //             new InstantCommand(() -> reefStateIndicator.set("B")),
+    //             leftChooser::get));
 
-    new Trigger(cdChooser::get)
-        .onTrue(
-            new InstantCommand(
-                () -> {
-                  abChooser.set(false);
-                  efChooser.set(false);
-                  ghChooser.set(false);
-                  ijChooser.set(false);
-                  klChooser.set(false);
-                }))
-        .onTrue(
-            new ConditionalCommand(
-                new InstantCommand(() -> reefStateIndicator.set("C")),
-                new InstantCommand(() -> reefStateIndicator.set("D")),
-                leftChooser::get));
+    // new Trigger(cdChooser::get)
+    //     .onTrue(
+    //         new InstantCommand(
+    //             () -> {
+    //               abChooser.set(false);
+    //               efChooser.set(false);
+    //               ghChooser.set(false);
+    //               ijChooser.set(false);
+    //               klChooser.set(false);
+    //             }))
+    //     .onTrue(
+    //         new ConditionalCommand(
+    //             new InstantCommand(() -> reefStateIndicator.set("C")),
+    //             new InstantCommand(() -> reefStateIndicator.set("D")),
+    //             leftChooser::get));
 
-    new Trigger(efChooser::get)
-        .onTrue(
-            new InstantCommand(
-                () -> {
-                  abChooser.set(false);
-                  cdChooser.set(false);
-                  ghChooser.set(false);
-                  ijChooser.set(false);
-                  klChooser.set(false);
-                }))
-        .onTrue(
-            new ConditionalCommand(
-                new InstantCommand(() -> reefStateIndicator.set("E")),
-                new InstantCommand(() -> reefStateIndicator.set("F")),
-                leftChooser::get));
+    // new Trigger(efChooser::get)
+    //     .onTrue(
+    //         new InstantCommand(
+    //             () -> {
+    //               abChooser.set(false);
+    //               cdChooser.set(false);
+    //               ghChooser.set(false);
+    //               ijChooser.set(false);
+    //               klChooser.set(false);
+    //             }))
+    //     .onTrue(
+    //         new ConditionalCommand(
+    //             new InstantCommand(() -> reefStateIndicator.set("E")),
+    //             new InstantCommand(() -> reefStateIndicator.set("F")),
+    //             leftChooser::get));
 
-    new Trigger(ghChooser::get)
-        .onTrue(
-            new InstantCommand(
-                () -> {
-                  abChooser.set(false);
-                  cdChooser.set(false);
-                  efChooser.set(false);
-                  ijChooser.set(false);
-                  klChooser.set(false);
-                }))
-        .onTrue(
-            new ConditionalCommand(
-                new InstantCommand(() -> reefStateIndicator.set("G")),
-                new InstantCommand(() -> reefStateIndicator.set("H")),
-                leftChooser::get));
+    // new Trigger(ghChooser::get)
+    //     .onTrue(
+    //         new InstantCommand(
+    //             () -> {
+    //               abChooser.set(false);
+    //               cdChooser.set(false);
+    //               efChooser.set(false);
+    //               ijChooser.set(false);
+    //               klChooser.set(false);
+    //             }))
+    //     .onTrue(
+    //         new ConditionalCommand(
+    //             new InstantCommand(() -> reefStateIndicator.set("G")),
+    //             new InstantCommand(() -> reefStateIndicator.set("H")),
+    //             leftChooser::get));
 
-    new Trigger(ijChooser::get)
-        .onTrue(
-            new InstantCommand(
-                () -> {
-                  abChooser.set(false);
-                  cdChooser.set(false);
-                  efChooser.set(false);
-                  ghChooser.set(false);
-                  klChooser.set(false);
-                }))
-        .onTrue(
-            new ConditionalCommand(
-                new InstantCommand(() -> reefStateIndicator.set("I")),
-                new InstantCommand(() -> reefStateIndicator.set("J")),
-                leftChooser::get));
+    // new Trigger(ijChooser::get)
+    //     .onTrue(
+    //         new InstantCommand(
+    //             () -> {
+    //               abChooser.set(false);
+    //               cdChooser.set(false);
+    //               efChooser.set(false);
+    //               ghChooser.set(false);
+    //               klChooser.set(false);
+    //             }))
+    //     .onTrue(
+    //         new ConditionalCommand(
+    //             new InstantCommand(() -> reefStateIndicator.set("I")),
+    //             new InstantCommand(() -> reefStateIndicator.set("J")),
+    //             leftChooser::get));
 
-    new Trigger(klChooser::get)
-        .onTrue(
-            new InstantCommand(
-                () -> {
-                  abChooser.set(false);
-                  cdChooser.set(false);
-                  efChooser.set(false);
-                  ghChooser.set(false);
-                  ijChooser.set(false);
-                }))
-        .onTrue(
-            new ConditionalCommand(
-                new InstantCommand(() -> reefStateIndicator.set("K")),
-                new InstantCommand(() -> reefStateIndicator.set("L")),
-                leftChooser::get));
+    // new Trigger(klChooser::get)
+    //     .onTrue(
+    //         new InstantCommand(
+    //             () -> {
+    //               abChooser.set(false);
+    //               cdChooser.set(false);
+    //               efChooser.set(false);
+    //               ghChooser.set(false);
+    //               ijChooser.set(false);
+    //             }))
+    //     .onTrue(
+    //         new ConditionalCommand(
+    //             new InstantCommand(() -> reefStateIndicator.set("K")),
+    //             new InstantCommand(() -> reefStateIndicator.set("L")),
+    //             leftChooser::get));
 
-    operatorController
-        .button(1)
-        .onTrue(
-            new InstantCommand(
-                () -> {
-                  leftChooser.set(true);
-                  rightChooser.set(false);
-                }));
+    // operatorController
+    //     .button(1)
+    //     .onTrue(
+    //         new InstantCommand(
+    //             () -> {
+    //               leftChooser.set(true);
+    //               rightChooser.set(false);
+    //             }));
 
-    operatorController
-        .button(2)
-        .onTrue(
-            new InstantCommand(
-                () -> {
-                  leftChooser.set(false);
-                  rightChooser.set(true);
-                }));
+    // operatorController
+    //     .button(2)
+    //     .onTrue(
+    //         new InstantCommand(
+    //             () -> {
+    //               leftChooser.set(false);
+    //               rightChooser.set(true);
+    //             }));
 
-    new Trigger(abChooser::get)
-        .onTrue(
-            DriveCommands.joystickDriveAtAngle(
-                drive,
-                () -> -driverController.getLeftY(),
-                () -> -driverController.getLeftX(),
-                () -> AllianceUtil.flipRotation2dAlliance(Rotation2d.fromDegrees(0))))
-        .and(driverController.a())
-        .whileTrue(
-            new ConditionalCommand(
-                DriveCommands.driveToReef(drive, "A"),
-                DriveCommands.driveToReef(drive, "B"),
-                leftChooser::get));
+    // new Trigger(abChooser::get)
+    //     .onTrue(
+    //         DriveCommands.joystickDriveAtAngle(
+    //             drive,
+    //             () -> -driverController.getLeftY(),
+    //             () -> -driverController.getLeftX(),
+    //             () -> AllianceUtil.flipRotation2dAlliance(Rotation2d.fromDegrees(0))))
+    //     .and(driverController.a())
+    //     .whileTrue(
+    //         new ConditionalCommand(
+    //             DriveCommands.driveToReef(drive, "A"),
+    //             DriveCommands.driveToReef(drive, "B"),
+    //             leftChooser::get));
 
-    new Trigger(cdChooser::get)
-        .onTrue(
-            DriveCommands.joystickDriveAtAngle(
-                drive,
-                () -> -driverController.getLeftY(),
-                () -> -driverController.getLeftX(),
-                () -> AllianceUtil.flipRotation2dAlliance(Rotation2d.fromDegrees(60))))
-        .and(driverController.a())
-        .whileTrue(
-            new ConditionalCommand(
-                DriveCommands.driveToReef(drive, "C"),
-                DriveCommands.driveToReef(drive, "D"),
-                leftChooser::get));
+    // new Trigger(cdChooser::get)
+    //     .onTrue(
+    //         DriveCommands.joystickDriveAtAngle(
+    //             drive,
+    //             () -> -driverController.getLeftY(),
+    //             () -> -driverController.getLeftX(),
+    //             () -> AllianceUtil.flipRotation2dAlliance(Rotation2d.fromDegrees(60))))
+    //     .and(driverController.a())
+    //     .whileTrue(
+    //         new ConditionalCommand(
+    //             DriveCommands.driveToReef(drive, "C"),
+    //             DriveCommands.driveToReef(drive, "D"),
+    //             leftChooser::get));
 
-    new Trigger(efChooser::get)
-        .onTrue(
-            DriveCommands.joystickDriveAtAngle(
-                drive,
-                () -> -driverController.getLeftY(),
-                () -> -driverController.getLeftX(),
-                () -> AllianceUtil.flipRotation2dAlliance(Rotation2d.fromDegrees(120))))
-        .and(driverController.a())
-        .whileTrue(
-            new ConditionalCommand(
-                DriveCommands.driveToReef(drive, "E"),
-                DriveCommands.driveToReef(drive, "F"),
-                leftChooser::get));
+    // new Trigger(efChooser::get)
+    //     .onTrue(
+    //         DriveCommands.joystickDriveAtAngle(
+    //             drive,
+    //             () -> -driverController.getLeftY(),
+    //             () -> -driverController.getLeftX(),
+    //             () -> AllianceUtil.flipRotation2dAlliance(Rotation2d.fromDegrees(120))))
+    //     .and(driverController.a())
+    //     .whileTrue(
+    //         new ConditionalCommand(
+    //             DriveCommands.driveToReef(drive, "E"),
+    //             DriveCommands.driveToReef(drive, "F"),
+    //             leftChooser::get));
 
-    new Trigger(ghChooser::get)
-        .onTrue(
-            DriveCommands.joystickDriveAtAngle(
-                drive,
-                () -> -driverController.getLeftY(),
-                () -> -driverController.getLeftX(),
-                () -> AllianceUtil.flipRotation2dAlliance(Rotation2d.fromDegrees(180))))
-        .and(driverController.a())
-        .whileTrue(
-            new ConditionalCommand(
-                DriveCommands.driveToReef(drive, "G"),
-                DriveCommands.driveToReef(drive, "H"),
-                leftChooser::get));
+    // new Trigger(ghChooser::get)
+    //     .onTrue(
+    //         DriveCommands.joystickDriveAtAngle(
+    //             drive,
+    //             () -> -driverController.getLeftY(),
+    //             () -> -driverController.getLeftX(),
+    //             () -> AllianceUtil.flipRotation2dAlliance(Rotation2d.fromDegrees(180))))
+    //     .and(driverController.a())
+    //     .whileTrue(
+    //         new ConditionalCommand(
+    //             DriveCommands.driveToReef(drive, "G"),
+    //             DriveCommands.driveToReef(drive, "H"),
+    //             leftChooser::get));
 
-    new Trigger(ijChooser::get)
-        .onTrue(
-            DriveCommands.joystickDriveAtAngle(
-                drive,
-                () -> -driverController.getLeftY(),
-                () -> -driverController.getLeftX(),
-                () -> AllianceUtil.flipRotation2dAlliance(Rotation2d.fromDegrees(-120))))
-        .and(driverController.a())
-        .whileTrue(
-            new ConditionalCommand(
-                DriveCommands.driveToReef(drive, "I"),
-                DriveCommands.driveToReef(drive, "J"),
-                leftChooser::get));
+    // new Trigger(ijChooser::get)
+    //     .onTrue(
+    //         DriveCommands.joystickDriveAtAngle(
+    //             drive,
+    //             () -> -driverController.getLeftY(),
+    //             () -> -driverController.getLeftX(),
+    //             () -> AllianceUtil.flipRotation2dAlliance(Rotation2d.fromDegrees(-120))))
+    //     .and(driverController.a())
+    //     .whileTrue(
+    //         new ConditionalCommand(
+    //             DriveCommands.driveToReef(drive, "I"),
+    //             DriveCommands.driveToReef(drive, "J"),
+    //             leftChooser::get));
 
-    new Trigger(klChooser::get)
-        .onTrue(
-            DriveCommands.joystickDriveAtAngle(
-                drive,
-                () -> -driverController.getLeftY(),
-                () -> -driverController.getLeftX(),
-                () -> AllianceUtil.flipRotation2dAlliance(Rotation2d.fromDegrees(-60))))
-        .and(driverController.a())
-        .whileTrue(
-            new ConditionalCommand(
-                DriveCommands.driveToReef(drive, "K"),
-                DriveCommands.driveToReef(drive, "L"),
-                leftChooser::get));
+    // new Trigger(klChooser::get)
+    //     .onTrue(
+    //         DriveCommands.joystickDriveAtAngle(
+    //             drive,
+    //             () -> -driverController.getLeftY(),
+    //             () -> -driverController.getLeftX(),
+    //             () -> AllianceUtil.flipRotation2dAlliance(Rotation2d.fromDegrees(-60))))
+    //     .and(driverController.a())
+    //     .whileTrue(
+    //         new ConditionalCommand(
+    //             DriveCommands.driveToReef(drive, "K"),
+    //             DriveCommands.driveToReef(drive, "L"),
+    //             leftChooser::get));
 
     new Trigger(manualMode::get)
         .whileTrue(
