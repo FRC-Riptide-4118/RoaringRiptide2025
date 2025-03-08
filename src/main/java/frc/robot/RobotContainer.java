@@ -72,7 +72,6 @@ public class RobotContainer {
 
   private final Flywheel algaeIntake;
 
-  @SuppressWarnings("unused")
   private final LED led;
 
   @SuppressWarnings("unused")
@@ -183,6 +182,8 @@ public class RobotContainer {
                 FlywheelConstants.ALGAE_INTAKE_GAINS);
 
         led = new LED(new LEDIOBlinkin("LED", 9));
+
+        // intakeSensor = new DigitalSensor(new DigitalSensorIO());
         break;
 
       case SIM:
@@ -362,8 +363,9 @@ public class RobotContainer {
             coralIntake,
             () ->
                 6.0
-                    * (driverController.getLeftTriggerAxis()
-                        - driverController.getRightTriggerAxis())));
+                        * (driverController.getLeftTriggerAxis()
+                            - driverController.getRightTriggerAxis())
+                    - 0.25));
 
     // Algae
     algaeIntake.setDefaultCommand(
