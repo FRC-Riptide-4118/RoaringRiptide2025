@@ -676,7 +676,7 @@ public class RobotContainer {
                 drive,
                 () -> -driverController.getLeftY(),
                 () -> -driverController.getLeftX(),
-                () -> AllianceUtil.flipRotation2dAlliance(Rotation2d.fromDegrees(240))))
+                () -> AllianceUtil.flipRotation2dAlliance(Rotation2d.fromDegrees(-120))))
         .and(driverController.a())
         .whileTrue(
             new ConditionalCommand(
@@ -690,7 +690,7 @@ public class RobotContainer {
                 drive,
                 () -> -driverController.getLeftY(),
                 () -> -driverController.getLeftX(),
-                () -> AllianceUtil.flipRotation2dAlliance(Rotation2d.fromDegrees(300))))
+                () -> AllianceUtil.flipRotation2dAlliance(Rotation2d.fromDegrees(-60))))
         .and(driverController.a())
         .whileTrue(
             new ConditionalCommand(
