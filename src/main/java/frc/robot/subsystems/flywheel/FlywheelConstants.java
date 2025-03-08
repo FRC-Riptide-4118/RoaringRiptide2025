@@ -21,6 +21,7 @@ public class FlywheelConstants {
       new FlywheelGains(0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0);
 
   public static final FlywheelHardwareConfig CORAL_INTAKE_CONFIG =
+      //   new FlywheelHardwareConfig(new int[] {10}, new boolean[] {false}, 3.0 / 4.0, 60, "");
       new FlywheelHardwareConfig(new int[] {10}, new boolean[] {false}, 25.0 / 1.0, 20, "");
 
   public static final FlywheelGains ALGAE_INTAKE_GAINS =
