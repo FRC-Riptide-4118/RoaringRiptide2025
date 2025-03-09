@@ -21,6 +21,9 @@ import frc.robot.commands.CoralPresets;
 import frc.robot.commands.DriveCommands;
 import frc.robot.commands.flywheel.FlywheelVoltageCommand;
 import frc.robot.subsystems.components.Components;
+import frc.robot.subsystems.digital_sensor.DigitalSensor;
+import frc.robot.subsystems.digital_sensor.DigitalSensorConstants;
+import frc.robot.subsystems.digital_sensor.DigitalSensorIODigitialInput;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.drive.Module;
 import frc.robot.subsystems.drive.azimuth_motor.AzimuthMotorConstants;
@@ -47,11 +50,6 @@ import frc.robot.subsystems.position_joint.PositionJointConstants;
 import frc.robot.subsystems.position_joint.PositionJointIOReplay;
 import frc.robot.subsystems.position_joint.PositionJointIOSim;
 import frc.robot.subsystems.position_joint.PositionJointIOSparkMax;
-import frc.robot.subsystems.vision.Vision;
-import frc.robot.subsystems.vision.VisionConstants;
-import frc.robot.subsystems.vision.VisionIO;
-import frc.robot.subsystems.vision.VisionIOPhotonVisionSim;
-import frc.robot.subsystems.vision.VisionIOPhotonVisionTrig;
 import frc.robot.util.pathplanner.AllianceUtil;
 import java.util.Map;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
@@ -74,8 +72,10 @@ public class RobotContainer {
 
   private final LED led;
 
+  private final DigitalSensor beamBreak;
+
   @SuppressWarnings("unused")
-  private final Vision vision;
+  //   private final Vision vision;
 
   private final PositionJoint elevator;
 
@@ -148,13 +148,13 @@ public class RobotContainer {
                 null,
                 SparkOdometryThread.getInstance());
 
-        vision =
-            new Vision(
-                drive::addVisionMeasurement,
-                new VisionIOPhotonVisionTrig(
-                    VisionConstants.camera0Name,
-                    VisionConstants.robotToCamera0,
-                    drive::getRotation));
+        // vision =
+        //     new Vision(
+        //         drive::addVisionMeasurement,
+        //         new VisionIOPhotonVisionTrig(
+        //             VisionConstants.camera1Name,
+        //             VisionConstants.robotToCamera1,
+        //             drive::getRotation));
 
         elevator =
             new PositionJoint(
@@ -183,6 +183,11 @@ public class RobotContainer {
 
         led = new LED(new LEDIOBlinkin("LED", 9));
 
+        beamBreak =
+            new DigitalSensor(
+                new DigitalSensorIODigitialInput(
+                    "Coral Wrist Beam Break", DigitalSensorConstants.BEAMBREAK_CONFIG));
+
         // intakeSensor = new DigitalSensor(new DigitalSensorIO());
         break;
 
@@ -208,13 +213,15 @@ public class RobotContainer {
                 null,
                 null);
 
-        vision =
-            new Vision(
-                drive::addVisionMeasurement,
-                new VisionIOPhotonVisionSim(
-                    VisionConstants.camera0Name, VisionConstants.robotToCamera0, drive::getPose),
-                new VisionIOPhotonVisionSim(
-                    VisionConstants.camera1Name, VisionConstants.robotToCamera1, drive::getPose));
+        // vision =
+        //     new Vision(
+        //         drive::addVisionMeasurement,
+        //         // new VisionIOPhotonVisionSim(
+        //         //     VisionConstants.camera0Name, VisionConstants.robotToCamera0,
+        // drive::getPose),
+        //         new VisionIOPhotonVisionSim(
+        //             VisionConstants.camera1Name, VisionConstants.robotToCamera1,
+        // drive::getPose));
 
         elevator =
             new PositionJoint(
@@ -242,6 +249,11 @@ public class RobotContainer {
                 FlywheelConstants.ALGAE_INTAKE_GAINS_SIM);
 
         led = new LED(new LEDIOReplay("LED"));
+
+        beamBreak =
+            new DigitalSensor(
+                new DigitalSensorIODigitialInput(
+                    "Coral Wrist Beam Break", DigitalSensorConstants.BEAMBREAK_CONFIG));
         break;
 
       default:
@@ -265,7 +277,7 @@ public class RobotContainer {
                 AzimuthMotorConstants.AZIMUTH_MOTOR_GAINS,
                 null,
                 null);
-        vision = new Vision(drive::addVisionMeasurement, new VisionIO() {}, new VisionIO() {});
+        // vision = new Vision(drive::addVisionMeasurement, new VisionIO() {}, new VisionIO() {});
 
         elevator =
             new PositionJoint(
@@ -288,6 +300,11 @@ public class RobotContainer {
                 new FlywheelIOReplay("Algae Intake"), FlywheelConstants.ALGAE_INTAKE_GAINS);
 
         led = new LED(new LEDIOReplay("LED"));
+
+        beamBreak =
+            new DigitalSensor(
+                new DigitalSensorIODigitialInput(
+                    "Coral Wrist Beam Break", DigitalSensorConstants.BEAMBREAK_CONFIG));
 
         break;
     }
@@ -405,12 +422,12 @@ public class RobotContainer {
     // Reset gyro to 0° when B button is pressed
     driverController.b().onTrue(Commands.runOnce(resetGyro, drive).ignoringDisable(true));
 
-    operatorController.povDown().onTrue(new InstantCommand(() -> abChooser.set(true)));
-    operatorController.povDownRight().onTrue(new InstantCommand(() -> cdChooser.set(true)));
-    operatorController.povUpRight().onTrue(new InstantCommand(() -> efChooser.set(true)));
-    operatorController.povUp().onTrue(new InstantCommand(() -> ghChooser.set(true)));
-    operatorController.povUpLeft().onTrue(new InstantCommand(() -> ijChooser.set(true)));
-    operatorController.povDownLeft().onTrue(new InstantCommand(() -> klChooser.set(true)));
+    // operatorController.povDown().onTrue(new InstantCommand(() -> abChooser.set(true)));
+    // operatorController.povDownRight().onTrue(new InstantCommand(() -> cdChooser.set(true)));
+    // operatorController.povUpRight().onTrue(new InstantCommand(() -> efChooser.set(true)));
+    // operatorController.povUp().onTrue(new InstantCommand(() -> ghChooser.set(true)));
+    // operatorController.povUpLeft().onTrue(new InstantCommand(() -> ijChooser.set(true)));
+    // operatorController.povDownLeft().onTrue(new InstantCommand(() -> klChooser.set(true)));
 
     operatorController
         .button(5)
