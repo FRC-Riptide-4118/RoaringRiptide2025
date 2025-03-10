@@ -36,4 +36,9 @@ public class CoralCommands {
     return CoralPresetCommand(
         elevator, preset::getElevatorPos, wrist, () -> preset.getWristPos().getRotations());
   }
+
+  // public static Command MoveWristCommand(PositionJoint wrist, double wristPos) {
+  //   // return MoveWristCommand(wrist, wristPos);
+  //   return
+  // }
 }
