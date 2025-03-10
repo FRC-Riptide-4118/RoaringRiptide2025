@@ -65,7 +65,7 @@ public class PositionJointConstants {
           "");
 
   public static final PositionJointGains WRIST_GAINS =
-      new PositionJointGains(2.0, 0, 0, 0, 0.7, 1.0, 0, 3.0, 3.0, -0.1, 0.286, 0, 0);
+      new PositionJointGains(2.0, 0, 0, 0.38, 0.9, 2.0, 0, 3.0, 0.5, -0.06, 0.26, 0, 0);
 
   public static final PositionJointGains WRIST_GAINS_SIM =
       new PositionJointGains(0, 0, 0, 0, 0, 0.0, 0, 0.0, 0.0, 0.0, 1.0, 0, 0);
@@ -75,7 +75,7 @@ public class PositionJointConstants {
           new int[] {11},
           new boolean[] {false},
           9.0 / 1.0,
-          40,
+          50,
           GravityType.COSINE,
           EncoderType.EXTERNAL_CANCODER,
           2,

@@ -24,6 +24,7 @@ import frc.robot.subsystems.components.Components;
 import frc.robot.subsystems.digital_sensor.DigitalSensor;
 import frc.robot.subsystems.digital_sensor.DigitalSensorConstants;
 import frc.robot.subsystems.digital_sensor.DigitalSensorIODigitialInput;
+import frc.robot.subsystems.digital_sensor.DigitalSensorIOReplay;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.drive.Module;
 import frc.robot.subsystems.drive.azimuth_motor.AzimuthMotorConstants;
@@ -301,10 +302,7 @@ public class RobotContainer {
 
         led = new LED(new LEDIOReplay("LED"));
 
-        beamBreak =
-            new DigitalSensor(
-                new DigitalSensorIODigitialInput(
-                    "Coral Wrist Beam Break", DigitalSensorConstants.BEAMBREAK_CONFIG));
+        beamBreak = new DigitalSensor(new DigitalSensorIOReplay("Coral Wrist Beam Break"));
 
         break;
     }
@@ -380,9 +378,8 @@ public class RobotContainer {
             coralIntake,
             () ->
                 6.0
-                        * (driverController.getLeftTriggerAxis()
-                            - driverController.getRightTriggerAxis())
-                    - 0.25));
+                    * (driverController.getLeftTriggerAxis()
+                        - driverController.getRightTriggerAxis())));
 
     // Algae
     algaeIntake.setDefaultCommand(
@@ -395,6 +392,9 @@ public class RobotContainer {
 
     // Switch to X pattern when X button is pressed
     driverController.x().onTrue(Commands.runOnce(drive::stopWithX, drive));
+
+    // Flick Wrist Up if Needed
+    // driverController.start().onTrue(CoralCommands.MoveWristCommand(wrist, 60));
 
     operatorController
         .button(8)
@@ -516,8 +516,14 @@ public class RobotContainer {
 
     operatorController.button(9).onTrue(new InstantCommand(() -> coralLevelIndicator.set("Zero")));
 
+    // Pick up from Human Player
     new Trigger(() -> operatorController.getRawAxis(2) > 0.5)
         .onTrue(new InstantCommand(() -> coralLevelIndicator.set("Human Player")));
+
+    // Flick on L4 to Score
+    new Trigger(() -> operatorController.getRawAxis(3) > 0.5)
+        .onTrue(new InstantCommand(() -> coralLevelIndicator.set("FLICK")))
+        .onTrue(new InstantCommand(() -> coralIntake.setVoltage(-6), coralIntake));
 
     new Trigger(abChooser::get)
         .onTrue(
@@ -732,7 +738,9 @@ public class RobotContainer {
                     "Human Player",
                     CoralCommands.CoralPresetCommand(elevator, wrist, CoralPresets.HUMAN_PLAYER),
                     "Zero",
-                    CoralCommands.CoralPresetCommand(elevator, wrist, CoralPresets.ZERO)),
+                    CoralCommands.CoralPresetCommand(elevator, wrist, CoralPresets.ZERO),
+                    "FLICK",
+                    CoralCommands.CoralPresetCommand(elevator, wrist, CoralPresets.FLICK)),
                 coralLevelIndicator::get));
   }
 
@@ -753,6 +761,9 @@ public class RobotContainer {
 
     NamedCommands.registerCommand(
         "L4", CoralCommands.CoralPresetCommand(elevator, wrist, CoralPresets.L4).withName("L4"));
+    NamedCommands.registerCommand(
+        "Zero",
+        CoralCommands.CoralPresetCommand(elevator, wrist, CoralPresets.ZERO).withName("Zero"));
   }
 
   /**
