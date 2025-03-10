@@ -422,12 +422,12 @@ public class RobotContainer {
     // Reset gyro to 0° when B button is pressed
     driverController.b().onTrue(Commands.runOnce(resetGyro, drive).ignoringDisable(true));
 
-    // operatorController.povDown().onTrue(new InstantCommand(() -> abChooser.set(true)));
-    // operatorController.povDownRight().onTrue(new InstantCommand(() -> cdChooser.set(true)));
-    // operatorController.povUpRight().onTrue(new InstantCommand(() -> efChooser.set(true)));
-    // operatorController.povUp().onTrue(new InstantCommand(() -> ghChooser.set(true)));
-    // operatorController.povUpLeft().onTrue(new InstantCommand(() -> ijChooser.set(true)));
-    // operatorController.povDownLeft().onTrue(new InstantCommand(() -> klChooser.set(true)));
+    operatorController.povDown().onTrue(new InstantCommand(() -> abChooser.set(true)));
+    operatorController.povDownRight().onTrue(new InstantCommand(() -> cdChooser.set(true)));
+    operatorController.povUpRight().onTrue(new InstantCommand(() -> efChooser.set(true)));
+    operatorController.povUp().onTrue(new InstantCommand(() -> ghChooser.set(true)));
+    operatorController.povUpLeft().onTrue(new InstantCommand(() -> ijChooser.set(true)));
+    operatorController.povDownLeft().onTrue(new InstantCommand(() -> klChooser.set(true)));
 
     operatorController
         .button(5)
