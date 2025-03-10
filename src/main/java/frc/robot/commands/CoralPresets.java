@@ -10,8 +10,8 @@ public class CoralPresets {
   public static final CoralPreset L4 = new CoralPreset("L4", 1.34, Rotation2d.fromDegrees(40));
   public static final CoralPreset FLICK =
       new CoralPreset("FLICK", 1.34, Rotation2d.fromDegrees(60));
-  // public static final CoralPreset HUMAN_PLAYER =
-  //     new CoralPreset("HumanPlayer", 0.3, Rotation2d.fromDegrees(60));
   public static final CoralPreset HUMAN_PLAYER =
       new CoralPreset("HumanPlayer", 0.25, Rotation2d.fromDegrees(60));
+  // public static final CoralPreset HUMAN_PLAYER =
+  //     new CoralPreset("HumanPlayer", 0.3, Rotation2d.fromDegrees(60));
 }
