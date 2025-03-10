@@ -124,6 +124,29 @@
         240
       ],
       "fov": 62.5
+    },
+    {
+      "name": "Front Top",
+      "rotations": [
+        {
+          "axis": "y",
+          "degrees": 20
+        },
+        {
+          "axis": "z",
+          "degrees": 0
+        }
+      ],
+      "position": [
+        0.0906,
+        0.0,
+        0.8428
+      ],
+      "resolution": [
+        320,
+        240
+      ],
+      "fov": 62.5
     }
   ],
   "name": "Penn"

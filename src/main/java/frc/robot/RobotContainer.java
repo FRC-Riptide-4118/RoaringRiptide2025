@@ -4,6 +4,7 @@ import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
@@ -345,15 +346,15 @@ public class RobotContainer {
   private void configureButtonBindings() {
     // Default command, normal field-relative drive
     drive.setDefaultCommand(
-        DriveCommands.joystickDrive(
+        DriveCommands.joystickDriveReef(
             drive,
-            // vision,
+            vision,
             () -> -driverController.getLeftY(),
             () -> -driverController.getLeftX(),
             () -> -driverController.getRightX()));
 
     // Switch to X pattern when X button is pressed
-    driverController.x().onTrue(Commands.runOnce(drive::stopWithX, drive));
+    // driverController.x().onTrue(Commands.runOnce(drive::stopWithX, drive));
 
     // driverController.y().whileTrue(DriveCommands.driveToReef());
     // // Reset gyro / odometry
@@ -369,7 +370,111 @@ public class RobotContainer {
                         : new Rotation2d())); // zero gyro
 
     // Reset gyro to 0° when B button is pressed
-    driverController.b().onTrue(Commands.runOnce(resetGyro, drive).ignoringDisable(true));
+    driverController.start().onTrue(Commands.runOnce(resetGyro, drive).ignoringDisable(true));
+
+    driverController
+        .a()
+        .onTrue(
+            DriveCommands.joystickDriveAtAngleCancellable(
+                drive,
+                () -> -driverController.getLeftY(),
+                () -> -driverController.getLeftX(),
+                () -> -driverController.getRightX(),
+                () -> AllianceUtil.flipRotation2dAlliance(Rotation2d.fromDegrees(180))));
+
+    driverController
+        .a()
+        .and(driverController.b())
+        .onTrue(
+            DriveCommands.joystickDriveAtAngleCancellable(
+                drive,
+                () -> -driverController.getLeftY(),
+                () -> -driverController.getLeftX(),
+                () -> -driverController.getRightX(),
+                () -> AllianceUtil.flipRotation2dAlliance(Rotation2d.fromDegrees(-120))));
+
+    driverController
+        .b()
+        .onTrue(
+            DriveCommands.joystickDriveAtAngleCancellable(
+                drive,
+                () -> -driverController.getLeftY(),
+                () -> -driverController.getLeftX(),
+                () -> -driverController.getRightX(),
+                () -> AllianceUtil.flipRotation2dAlliance(Rotation2d.fromDegrees(270))));
+
+    driverController
+        .b()
+        .and(driverController.y())
+        .onTrue(
+            DriveCommands.joystickDriveAtAngleCancellable(
+                drive,
+                () -> -driverController.getLeftY(),
+                () -> -driverController.getLeftX(),
+                () -> -driverController.getRightX(),
+                () -> AllianceUtil.flipRotation2dAlliance(Rotation2d.fromDegrees(-60))));
+
+    driverController
+        .y()
+        .onTrue(
+            DriveCommands.joystickDriveAtAngleCancellable(
+                drive,
+                () -> -driverController.getLeftY(),
+                () -> -driverController.getLeftX(),
+                () -> -driverController.getRightX(),
+                () -> AllianceUtil.flipRotation2dAlliance(Rotation2d.fromDegrees(0))));
+
+    driverController
+        .y()
+        .and(driverController.x())
+        .onTrue(
+            DriveCommands.joystickDriveAtAngleCancellable(
+                drive,
+                () -> -driverController.getLeftY(),
+                () -> -driverController.getLeftX(),
+                () -> -driverController.getRightX(),
+                () -> AllianceUtil.flipRotation2dAlliance(Rotation2d.fromDegrees(60))));
+
+    driverController
+        .x()
+        .onTrue(
+            DriveCommands.joystickDriveAtAngleCancellable(
+                drive,
+                () -> -driverController.getLeftY(),
+                () -> -driverController.getLeftX(),
+                () -> -driverController.getRightX(),
+                () -> AllianceUtil.flipRotation2dAlliance(Rotation2d.fromDegrees(90))));
+
+    driverController
+        .x()
+        .and(driverController.a())
+        .onTrue(
+            DriveCommands.joystickDriveAtAngleCancellable(
+                drive,
+                () -> -driverController.getLeftY(),
+                () -> -driverController.getLeftX(),
+                () -> -driverController.getRightX(),
+                () -> AllianceUtil.flipRotation2dAlliance(Rotation2d.fromDegrees(120))));
+
+    driverController
+        .povUp()
+        .whileTrue(
+            DriveCommands.chassisSpeedsDriveRobotRelative(drive, new ChassisSpeeds(0.5, 0, 0)));
+
+    driverController
+        .povDown()
+        .whileTrue(
+            DriveCommands.chassisSpeedsDriveRobotRelative(drive, new ChassisSpeeds(-0.5, 0, 0)));
+
+    driverController
+        .povLeft()
+        .whileTrue(
+            DriveCommands.chassisSpeedsDriveRobotRelative(drive, new ChassisSpeeds(0, 0.5, 0.0)));
+
+    driverController
+        .povRight()
+        .whileTrue(
+            DriveCommands.chassisSpeedsDriveRobotRelative(drive, new ChassisSpeeds(0, -0.5, 0.0)));
 
     // operatorController
     //     .button(1)
