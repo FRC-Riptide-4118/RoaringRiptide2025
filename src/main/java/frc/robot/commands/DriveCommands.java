@@ -22,6 +22,7 @@ import edu.wpi.first.wpilibj2.command.FunctionalCommand;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.drive.DriveConstants;
 import frc.robot.subsystems.vision.Vision;
+import frc.robot.util.mechanical_advantage.LoggedTunableNumber;
 import java.io.IOException;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
@@ -42,6 +43,8 @@ public class DriveCommands {
   private static final double FF_RAMP_RATE = 0.1; // Volts/Sec
   private static final double WHEEL_RADIUS_MAX_VELOCITY = 0.25; // Rad/Sec
   private static final double WHEEL_RADIUS_RAMP_RATE = 0.05; // Rad/Sec^2
+
+  private static final LoggedTunableNumber REEF_P = new LoggedTunableNumber("ReefP", 3.0);
 
   private DriveCommands() {}
 
@@ -108,6 +111,7 @@ public class DriveCommands {
 
   /**
    * Field relative drive command using two joysticks (controlling linear and angular velocities).
+   * Automatically centers to any april tag seen by the robot.
    */
   public static Command joystickDriveReef(
       Drive drive,
@@ -142,11 +146,13 @@ public class DriveCommands {
                   isFlipped
                       ? drive.getRotation().plus(new Rotation2d(Math.PI))
                       : drive.getRotation());
-          // if (vision.getRobotToTagTransform().tagID() != 0) {
-          if (speeds.vxMetersPerSecond > 0.1) {
-            speeds.vyMetersPerSecond = 3 * vision.getRobotToTagTransform().robotToTag().getY();
+
+          double headingEffort = REEF_P.get() * vision.getTagYaw().getDegrees();
+
+          if (Math.signum(speeds.vyMetersPerSecond) < 0.1
+              || Math.signum(headingEffort) == Math.signum(speeds.vyMetersPerSecond)) {
+            speeds.vyMetersPerSecond = headingEffort;
           }
-          // }
 
           drive.runVelocity(speeds);
         },

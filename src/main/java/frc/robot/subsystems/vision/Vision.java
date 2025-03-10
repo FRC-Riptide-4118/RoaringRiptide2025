@@ -172,6 +172,10 @@ public class Vision extends SubsystemBase {
     return inputs[0].robotToTagTransform;
   }
 
+  public Rotation2d getTagYaw() {
+    return inputs[0].latestTargetObservation.tx();
+  }
+
   @FunctionalInterface
   public static interface VisionConsumer {
     public void accept(

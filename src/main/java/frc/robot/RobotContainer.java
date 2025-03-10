@@ -52,6 +52,11 @@ import frc.robot.subsystems.position_joint.PositionJointConstants;
 import frc.robot.subsystems.position_joint.PositionJointIOReplay;
 import frc.robot.subsystems.position_joint.PositionJointIOSim;
 import frc.robot.subsystems.position_joint.PositionJointIOSparkMax;
+import frc.robot.subsystems.vision.Vision;
+import frc.robot.subsystems.vision.VisionConstants;
+import frc.robot.subsystems.vision.VisionIO;
+import frc.robot.subsystems.vision.VisionIOPhotonVisionSim;
+import frc.robot.subsystems.vision.VisionIOPhotonVisionTrig;
 import frc.robot.util.pathplanner.AllianceUtil;
 import java.util.Map;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
@@ -77,7 +82,7 @@ public class RobotContainer {
   private final DigitalSensor beamBreak;
 
   @SuppressWarnings("unused")
-  //   private final Vision vision;
+  private final Vision vision;
 
   private final PositionJoint elevator;
 
@@ -150,13 +155,13 @@ public class RobotContainer {
                 null,
                 SparkOdometryThread.getInstance());
 
-        // vision =
-        //     new Vision(
-        //         drive::addVisionMeasurement,
-        //         new VisionIOPhotonVisionTrig(
-        //             VisionConstants.camera1Name,
-        //             VisionConstants.robotToCamera1,
-        //             drive::getRotation));
+        vision =
+            new Vision(
+                drive::addVisionMeasurement,
+                new VisionIOPhotonVisionTrig(
+                    VisionConstants.camera1Name,
+                    VisionConstants.robotToCamera1,
+                    drive::getRotation));
 
         elevator =
             new PositionJoint(
@@ -215,15 +220,14 @@ public class RobotContainer {
                 null,
                 null);
 
-        // vision =
-        //     new Vision(
-        //         drive::addVisionMeasurement,
-        //         // new VisionIOPhotonVisionSim(
-        //         //     VisionConstants.camera0Name, VisionConstants.robotToCamera0,
-        // drive::getPose),
-        //         new VisionIOPhotonVisionSim(
-        //             VisionConstants.camera1Name, VisionConstants.robotToCamera1,
-        // drive::getPose));
+        vision =
+            new Vision(
+                drive::addVisionMeasurement,
+                // new VisionIOPhotonVisionSim(
+                //     VisionConstants.camera0Name, VisionConstants.robotToCamera0,
+                // drive::getPose),
+                new VisionIOPhotonVisionSim(
+                    VisionConstants.camera1Name, VisionConstants.robotToCamera1, drive::getPose));
 
         elevator =
             new PositionJoint(
@@ -279,7 +283,7 @@ public class RobotContainer {
                 AzimuthMotorConstants.AZIMUTH_MOTOR_GAINS,
                 null,
                 null);
-        // vision = new Vision(drive::addVisionMeasurement, new VisionIO() {}, new VisionIO() {});
+        vision = new Vision(drive::addVisionMeasurement, new VisionIO() {}, new VisionIO() {});
 
         elevator =
             new PositionJoint(
