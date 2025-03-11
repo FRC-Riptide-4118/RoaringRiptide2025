@@ -45,7 +45,7 @@ public class DriveCommands {
   private static final double WHEEL_RADIUS_MAX_VELOCITY = 0.25; // Rad/Sec
   private static final double WHEEL_RADIUS_RAMP_RATE = 0.05; // Rad/Sec^2
 
-  private static final LoggedTunableNumber REEF_P = new LoggedTunableNumber("ReefP", 3.0);
+  private static final LoggedTunableNumber REEF_P = new LoggedTunableNumber("ReefP", 0.05);
   private static final LoggedTunableNumber APPROACH_SPEED =
       new LoggedTunableNumber("Approach Speed", 1.0);
 
@@ -152,11 +152,22 @@ public class DriveCommands {
                       ? drive.getRotation().plus(new Rotation2d(Math.PI))
                       : drive.getRotation());
 
-          double headingEffort = REEF_P.get() * vision.getTagYaw().getDegrees();
+          double xEffort =
+              Math.abs(vision.getRobotToTagTransform().yaw()) < 2
+                  ? -REEF_P.get() * vision.getRobotToTagTransform().yaw()
+                  : 0.0;
 
-          if (Math.signum(speeds.vyMetersPerSecond) < 0.1
-              || Math.signum(headingEffort) == Math.signum(speeds.vyMetersPerSecond)) {
-            speeds.vyMetersPerSecond = headingEffort;
+          if (xEffort < 0.5) {
+            xEffort = 0.0;
+          }
+          Logger.recordOutput("Drive/xEffort", xEffort);
+          if (Math.abs(speeds.vxMetersPerSecond) < 0.1) {
+            if (vision.getRobotToTagTransform().tagID() != 0) {
+              if (Math.signum(speeds.vyMetersPerSecond) < 0.1
+                  || Math.signum(xEffort) == Math.signum(speeds.vyMetersPerSecond)) {
+                speeds.vyMetersPerSecond = xEffort;
+              }
+            }
           }
 
           if (driveForward.getAsBoolean()) {
@@ -174,9 +185,11 @@ public class DriveCommands {
    */
   public static Command joystickDriveAtAngle(
       Drive drive,
+      Vision vision,
       DoubleSupplier xSupplier,
       DoubleSupplier ySupplier,
-      Supplier<Rotation2d> rotationSupplier) {
+      Supplier<Rotation2d> rotationSupplier,
+      BooleanSupplier driveForward) {
 
     // Create PID controller
     ProfiledPIDController angleController =
@@ -214,6 +227,7 @@ public class DriveCommands {
                       isFlipped
                           ? drive.getRotation().plus(new Rotation2d(Math.PI))
                           : drive.getRotation());
+
               drive.runVelocity(speeds);
             },
             drive)
@@ -229,10 +243,12 @@ public class DriveCommands {
    */
   public static Command joystickDriveAtAngleCancellable(
       Drive drive,
+      Vision vision,
       DoubleSupplier xSupplier,
       DoubleSupplier ySupplier,
       DoubleSupplier omegaSupplier,
-      Supplier<Rotation2d> rotationSupplier) {
+      Supplier<Rotation2d> rotationSupplier,
+      BooleanSupplier driveForward) {
 
     // Create PID controller
     ProfiledPIDController angleController =
@@ -270,6 +286,25 @@ public class DriveCommands {
                       isFlipped
                           ? drive.getRotation().plus(new Rotation2d(Math.PI))
                           : drive.getRotation());
+
+              double xEffort =
+                  Math.abs(vision.getRobotToTagTransform().yaw()) > 2
+                      ? -REEF_P.get() * vision.getRobotToTagTransform().yaw()
+                      : 0.0;
+              Logger.recordOutput("Drive/xEffort", xEffort);
+              if (Math.abs(speeds.vxMetersPerSecond) < 0.05) {
+                if (vision.getRobotToTagTransform().tagID() != 0) {
+                  if (Math.signum(speeds.vyMetersPerSecond) < 0.05
+                      || Math.signum(xEffort) == Math.signum(speeds.vyMetersPerSecond)) {
+                    speeds.vyMetersPerSecond = xEffort;
+                  }
+                }
+              }
+
+              if (driveForward.getAsBoolean()) {
+                speeds.vxMetersPerSecond = APPROACH_SPEED.get();
+              }
+
               drive.runVelocity(speeds);
             },
             drive)

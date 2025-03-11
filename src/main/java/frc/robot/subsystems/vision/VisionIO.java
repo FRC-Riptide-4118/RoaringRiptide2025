@@ -17,10 +17,10 @@ public interface VisionIO {
     public double[] bestDistance = new double[0];
     public double[] worstDistance = new double[0];
 
-    public TransformTag robotToTagTransform = new TransformTag(new Transform3d(), 0);
+    public TransformTag robotToTagTransform = new TransformTag(new Transform3d(), 0, 0);
   }
 
-  public record TransformTag(Transform3d robotToTag, int tagID) {}
+  public record TransformTag(Transform3d robotToTag, int tagID, double yaw) {}
 
   /** Represents the angle to a simple target, not used for pose estimation. */
   public static record TargetObservation(Rotation2d tx, Rotation2d ty) {}

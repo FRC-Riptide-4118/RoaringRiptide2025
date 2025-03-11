@@ -56,6 +56,7 @@ import frc.robot.subsystems.vision.VisionConstants;
 import frc.robot.subsystems.vision.VisionIO;
 import frc.robot.subsystems.vision.VisionIOPhotonVisionSim;
 import frc.robot.subsystems.vision.VisionIOPhotonVisionTrig;
+import frc.robot.util.pathplanner.AdvancedPPHolonomicDriveController;
 import frc.robot.util.pathplanner.AllianceUtil;
 import java.util.Map;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
@@ -158,8 +159,8 @@ public class RobotContainer {
             new Vision(
                 drive::addVisionMeasurement,
                 new VisionIOPhotonVisionTrig(
-                    VisionConstants.camera1Name,
-                    VisionConstants.robotToCamera1,
+                    VisionConstants.camera0Name,
+                    VisionConstants.robotToCamera0,
                     drive::getRotation));
 
         elevator =
@@ -368,13 +369,11 @@ public class RobotContainer {
   private void configureButtonBindings() {
     // Default command, normal field-relative drive
     drive.setDefaultCommand(
-        DriveCommands.joystickDriveReef(
+        DriveCommands.joystickDrive(
             drive,
-            vision,
             () -> -driverController.getLeftY(),
             () -> -driverController.getLeftX(),
-            () -> -driverController.getRightX(),
-            driverController.povUp()));
+            () -> -driverController.getRightX()));
 
     // Coral
     // Goes at -1 volt constantly to keep coral inside
@@ -429,87 +428,111 @@ public class RobotContainer {
 
     driverController
         .a()
+        .or(operatorController.povDown())
         .onTrue(
             DriveCommands.joystickDriveAtAngleCancellable(
                 drive,
+                vision,
                 () -> -driverController.getLeftY(),
                 () -> -driverController.getLeftX(),
                 () -> -driverController.getRightX(),
-                () -> AllianceUtil.flipRotation2dAlliance(Rotation2d.fromDegrees(180))));
+                () -> AllianceUtil.flipRotation2dAlliance(Rotation2d.fromDegrees(180)),
+                driverController.povUp()));
 
     driverController
         .a()
         .and(driverController.b())
+        .or(operatorController.povDownRight())
         .onTrue(
             DriveCommands.joystickDriveAtAngleCancellable(
                 drive,
+                vision,
                 () -> -driverController.getLeftY(),
                 () -> -driverController.getLeftX(),
                 () -> -driverController.getRightX(),
-                () -> AllianceUtil.flipRotation2dAlliance(Rotation2d.fromDegrees(-120))));
+                () -> AllianceUtil.flipRotation2dAlliance(Rotation2d.fromDegrees(-120)),
+                driverController.povUp()));
 
     driverController
         .b()
+        .or(operatorController.povRight())
         .onTrue(
             DriveCommands.joystickDriveAtAngleCancellable(
                 drive,
+                vision,
                 () -> -driverController.getLeftY(),
                 () -> -driverController.getLeftX(),
                 () -> -driverController.getRightX(),
-                () -> AllianceUtil.flipRotation2dAlliance(Rotation2d.fromDegrees(270))));
+                () -> AllianceUtil.flipRotation2dAlliance(Rotation2d.fromDegrees(270)),
+                driverController.povUp()));
 
     driverController
         .b()
         .and(driverController.y())
+        .or(operatorController.povUpRight())
         .onTrue(
             DriveCommands.joystickDriveAtAngleCancellable(
                 drive,
+                vision,
                 () -> -driverController.getLeftY(),
                 () -> -driverController.getLeftX(),
                 () -> -driverController.getRightX(),
-                () -> AllianceUtil.flipRotation2dAlliance(Rotation2d.fromDegrees(-60))));
+                () -> AllianceUtil.flipRotation2dAlliance(Rotation2d.fromDegrees(-60)),
+                driverController.povUp()));
 
     driverController
         .y()
+        .or(operatorController.povUp())
         .onTrue(
             DriveCommands.joystickDriveAtAngleCancellable(
                 drive,
+                vision,
                 () -> -driverController.getLeftY(),
                 () -> -driverController.getLeftX(),
                 () -> -driverController.getRightX(),
-                () -> AllianceUtil.flipRotation2dAlliance(Rotation2d.fromDegrees(0))));
+                () -> AllianceUtil.flipRotation2dAlliance(Rotation2d.fromDegrees(0)),
+                driverController.povUp()));
 
     driverController
         .y()
         .and(driverController.x())
+        .or(operatorController.povUpLeft())
         .onTrue(
             DriveCommands.joystickDriveAtAngleCancellable(
                 drive,
+                vision,
                 () -> -driverController.getLeftY(),
                 () -> -driverController.getLeftX(),
                 () -> -driverController.getRightX(),
-                () -> AllianceUtil.flipRotation2dAlliance(Rotation2d.fromDegrees(60))));
+                () -> AllianceUtil.flipRotation2dAlliance(Rotation2d.fromDegrees(60)),
+                driverController.povUp()));
 
     driverController
         .x()
+        .or(operatorController.povLeft())
         .onTrue(
             DriveCommands.joystickDriveAtAngleCancellable(
                 drive,
+                vision,
                 () -> -driverController.getLeftY(),
                 () -> -driverController.getLeftX(),
                 () -> -driverController.getRightX(),
-                () -> AllianceUtil.flipRotation2dAlliance(Rotation2d.fromDegrees(90))));
+                () -> AllianceUtil.flipRotation2dAlliance(Rotation2d.fromDegrees(90)),
+                driverController.povUp()));
 
     driverController
         .x()
         .and(driverController.a())
+        .or(operatorController.povDownLeft())
         .onTrue(
             DriveCommands.joystickDriveAtAngleCancellable(
                 drive,
+                vision,
                 () -> -driverController.getLeftY(),
                 () -> -driverController.getLeftX(),
                 () -> -driverController.getRightX(),
-                () -> AllianceUtil.flipRotation2dAlliance(Rotation2d.fromDegrees(120))));
+                () -> AllianceUtil.flipRotation2dAlliance(Rotation2d.fromDegrees(120)),
+                driverController.povUp()));
 
     operatorController.povDown().onTrue(new InstantCommand(() -> abChooser.set(true)));
     operatorController.povDownRight().onTrue(new InstantCommand(() -> cdChooser.set(true)));
@@ -849,10 +872,56 @@ public class RobotContainer {
     //         coralLevelIndicator::get));
 
     NamedCommands.registerCommand(
-        "L4", CoralCommands.CoralPresetCommand(elevator, wrist, CoralPresets.L4).withName("L4"));
+        "L4",
+        CoralCommands.CoralPresetCommand(elevator, wrist, CoralPresets.L4)
+            .withName("L4")
+            .withTimeout(1.5));
+
+    NamedCommands.registerCommand(
+        "L3",
+        CoralCommands.CoralPresetCommand(elevator, wrist, CoralPresets.L3)
+            .withName("L3")
+            .withTimeout(1.5));
+
+    NamedCommands.registerCommand(
+        "L2",
+        CoralCommands.CoralPresetCommand(elevator, wrist, CoralPresets.L2)
+            .withName("L2")
+            .withTimeout(1.5));
+
+    NamedCommands.registerCommand(
+        "L1",
+        CoralCommands.CoralPresetCommand(elevator, wrist, CoralPresets.L1)
+            .withName("L1")
+            .withTimeout(1.5));
+
     NamedCommands.registerCommand(
         "Zero",
-        CoralCommands.CoralPresetCommand(elevator, wrist, CoralPresets.ZERO).withName("Zero"));
+        CoralCommands.CoralPresetCommand(elevator, wrist, CoralPresets.ZERO)
+            .withName("Zero")
+            .withTimeout(0.7));
+
+    NamedCommands.registerCommand(
+        "Intake Coral",
+        CoralCommands.CoralPresetCommand(elevator, wrist, CoralPresets.HUMAN_PLAYER)
+            .alongWith(
+                new FlywheelVoltageCommand(coralIntake, () -> 6.0)
+                    .withName("Intake Coral")
+                    .withTimeout(1.5)
+                    .andThen(
+                        new FlywheelVoltageCommand(coralIntake, () -> 0.0)
+                            .withName("Stop Coral Intake")
+                            .withTimeout(0.0))));
+
+    NamedCommands.registerCommand(
+        "Flick",
+        CoralCommands.CoralPresetCommand(elevator, wrist, CoralPresets.FLICK)
+            .withName("Flick")
+            .withTimeout(0.5));
+
+    NamedCommands.registerCommand(
+        "AlignToReef",
+        new InstantCommand(() -> AdvancedPPHolonomicDriveController.overrideYFeedback(null)));
   }
 
   /**
