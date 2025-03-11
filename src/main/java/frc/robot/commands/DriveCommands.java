@@ -28,6 +28,7 @@ import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.function.BooleanSupplier;
 import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
 import org.json.simple.parser.ParseException;
@@ -45,6 +46,8 @@ public class DriveCommands {
   private static final double WHEEL_RADIUS_RAMP_RATE = 0.05; // Rad/Sec^2
 
   private static final LoggedTunableNumber REEF_P = new LoggedTunableNumber("ReefP", 3.0);
+  private static final LoggedTunableNumber APPROACH_SPEED =
+      new LoggedTunableNumber("Approach Speed", 1.0);
 
   private DriveCommands() {}
 
@@ -111,14 +114,16 @@ public class DriveCommands {
 
   /**
    * Field relative drive command using two joysticks (controlling linear and angular velocities).
-   * Automatically centers to any april tag seen by the robot.
+   * Automatically centers to any april tag seen by the robot. Can drive into the reef with a button
+   * as confirmation
    */
   public static Command joystickDriveReef(
       Drive drive,
       Vision vision,
       DoubleSupplier xSupplier,
       DoubleSupplier ySupplier,
-      DoubleSupplier omegaSupplier) {
+      DoubleSupplier omegaSupplier,
+      BooleanSupplier driveForward) {
     return Commands.run(
         () -> {
           // Get linear velocity
@@ -154,6 +159,9 @@ public class DriveCommands {
             speeds.vyMetersPerSecond = headingEffort;
           }
 
+          if (driveForward.getAsBoolean()) {
+            speeds.vxMetersPerSecond = APPROACH_SPEED.get();
+          }
           drive.runVelocity(speeds);
         },
         drive);

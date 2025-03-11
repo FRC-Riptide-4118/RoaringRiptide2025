@@ -4,7 +4,6 @@ import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
@@ -374,7 +373,8 @@ public class RobotContainer {
             vision,
             () -> -driverController.getLeftY(),
             () -> -driverController.getLeftX(),
-            () -> -driverController.getRightX()));
+            () -> -driverController.getRightX(),
+            driverController.povUp()));
 
     // Coral
     // Goes at -1 volt constantly to keep coral inside
@@ -510,26 +510,6 @@ public class RobotContainer {
                 () -> -driverController.getLeftX(),
                 () -> -driverController.getRightX(),
                 () -> AllianceUtil.flipRotation2dAlliance(Rotation2d.fromDegrees(120))));
-
-    driverController
-        .povUp()
-        .whileTrue(
-            DriveCommands.chassisSpeedsDriveRobotRelative(drive, new ChassisSpeeds(0.5, 0, 0)));
-
-    driverController
-        .povDown()
-        .whileTrue(
-            DriveCommands.chassisSpeedsDriveRobotRelative(drive, new ChassisSpeeds(-0.5, 0, 0)));
-
-    driverController
-        .povLeft()
-        .whileTrue(
-            DriveCommands.chassisSpeedsDriveRobotRelative(drive, new ChassisSpeeds(0, 0.5, 0.0)));
-
-    driverController
-        .povRight()
-        .whileTrue(
-            DriveCommands.chassisSpeedsDriveRobotRelative(drive, new ChassisSpeeds(0, -0.5, 0.0)));
 
     operatorController.povDown().onTrue(new InstantCommand(() -> abChooser.set(true)));
     operatorController.povDownRight().onTrue(new InstantCommand(() -> cdChooser.set(true)));
@@ -748,89 +728,89 @@ public class RobotContainer {
                   rightChooser.set(true);
                 }));
 
-    new Trigger(abChooser::get)
-        .onTrue(
-            DriveCommands.joystickDriveAtAngle(
-                drive,
-                () -> -driverController.getLeftY(),
-                () -> -driverController.getLeftX(),
-                () -> AllianceUtil.flipRotation2dAlliance(Rotation2d.fromDegrees(0))))
-        .and(driverController.a())
-        .whileTrue(
-            new ConditionalCommand(
-                DriveCommands.driveToReef(drive, "A"),
-                DriveCommands.driveToReef(drive, "B"),
-                leftChooser::get));
+    // new Trigger(abChooser::get)
+    //     .onTrue(
+    //         DriveCommands.joystickDriveAtAngle(
+    //             drive,
+    //             () -> -driverController.getLeftY(),
+    //             () -> -driverController.getLeftX(),
+    //             () -> AllianceUtil.flipRotation2dAlliance(Rotation2d.fromDegrees(0))))
+    //     .and(driverController.a())
+    //     .whileTrue(
+    //         new ConditionalCommand(
+    //             DriveCommands.driveToReef(drive, "A"),
+    //             DriveCommands.driveToReef(drive, "B"),
+    //             leftChooser::get));
 
-    new Trigger(cdChooser::get)
-        .onTrue(
-            DriveCommands.joystickDriveAtAngle(
-                drive,
-                () -> -driverController.getLeftY(),
-                () -> -driverController.getLeftX(),
-                () -> AllianceUtil.flipRotation2dAlliance(Rotation2d.fromDegrees(60))))
-        .and(driverController.a())
-        .whileTrue(
-            new ConditionalCommand(
-                DriveCommands.driveToReef(drive, "C"),
-                DriveCommands.driveToReef(drive, "D"),
-                leftChooser::get));
+    // new Trigger(cdChooser::get)
+    //     .onTrue(
+    //         DriveCommands.joystickDriveAtAngle(
+    //             drive,
+    //             () -> -driverController.getLeftY(),
+    //             () -> -driverController.getLeftX(),
+    //             () -> AllianceUtil.flipRotation2dAlliance(Rotation2d.fromDegrees(60))))
+    //     .and(driverController.a())
+    //     .whileTrue(
+    //         new ConditionalCommand(
+    //             DriveCommands.driveToReef(drive, "C"),
+    //             DriveCommands.driveToReef(drive, "D"),
+    //             leftChooser::get));
 
-    new Trigger(efChooser::get)
-        .onTrue(
-            DriveCommands.joystickDriveAtAngle(
-                drive,
-                () -> -driverController.getLeftY(),
-                () -> -driverController.getLeftX(),
-                () -> AllianceUtil.flipRotation2dAlliance(Rotation2d.fromDegrees(120))))
-        .and(driverController.a())
-        .whileTrue(
-            new ConditionalCommand(
-                DriveCommands.driveToReef(drive, "E"),
-                DriveCommands.driveToReef(drive, "F"),
-                leftChooser::get));
+    // new Trigger(efChooser::get)
+    //     .onTrue(
+    //         DriveCommands.joystickDriveAtAngle(
+    //             drive,
+    //             () -> -driverController.getLeftY(),
+    //             () -> -driverController.getLeftX(),
+    //             () -> AllianceUtil.flipRotation2dAlliance(Rotation2d.fromDegrees(120))))
+    //     .and(driverController.a())
+    //     .whileTrue(
+    //         new ConditionalCommand(
+    //             DriveCommands.driveToReef(drive, "E"),
+    //             DriveCommands.driveToReef(drive, "F"),
+    //             leftChooser::get));
 
-    new Trigger(ghChooser::get)
-        .onTrue(
-            DriveCommands.joystickDriveAtAngle(
-                drive,
-                () -> -driverController.getLeftY(),
-                () -> -driverController.getLeftX(),
-                () -> AllianceUtil.flipRotation2dAlliance(Rotation2d.fromDegrees(180))))
-        .and(driverController.a())
-        .whileTrue(
-            new ConditionalCommand(
-                DriveCommands.driveToReef(drive, "G"),
-                DriveCommands.driveToReef(drive, "H"),
-                leftChooser::get));
+    // new Trigger(ghChooser::get)
+    //     .onTrue(
+    //         DriveCommands.joystickDriveAtAngle(
+    //             drive,
+    //             () -> -driverController.getLeftY(),
+    //             () -> -driverController.getLeftX(),
+    //             () -> AllianceUtil.flipRotation2dAlliance(Rotation2d.fromDegrees(180))))
+    //     .and(driverController.a())
+    //     .whileTrue(
+    //         new ConditionalCommand(
+    //             DriveCommands.driveToReef(drive, "G"),
+    //             DriveCommands.driveToReef(drive, "H"),
+    //             leftChooser::get));
 
-    new Trigger(ijChooser::get)
-        .onTrue(
-            DriveCommands.joystickDriveAtAngle(
-                drive,
-                () -> -driverController.getLeftY(),
-                () -> -driverController.getLeftX(),
-                () -> AllianceUtil.flipRotation2dAlliance(Rotation2d.fromDegrees(-120))))
-        .and(driverController.a())
-        .whileTrue(
-            new ConditionalCommand(
-                DriveCommands.driveToReef(drive, "I"),
-                DriveCommands.driveToReef(drive, "J"),
-                leftChooser::get));
+    // new Trigger(ijChooser::get)
+    //     .onTrue(
+    //         DriveCommands.joystickDriveAtAngle(
+    //             drive,
+    //             () -> -driverController.getLeftY(),
+    //             () -> -driverController.getLeftX(),
+    //             () -> AllianceUtil.flipRotation2dAlliance(Rotation2d.fromDegrees(-120))))
+    //     .and(driverController.a())
+    //     .whileTrue(
+    //         new ConditionalCommand(
+    //             DriveCommands.driveToReef(drive, "I"),
+    //             DriveCommands.driveToReef(drive, "J"),
+    //             leftChooser::get));
 
-    new Trigger(klChooser::get)
-        .onTrue(
-            DriveCommands.joystickDriveAtAngle(
-                drive,
-                () -> -driverController.getLeftY(),
-                () -> -driverController.getLeftX(),
-                () -> AllianceUtil.flipRotation2dAlliance(Rotation2d.fromDegrees(-60))))
-        .and(driverController.a())
-        .whileTrue(
-            new ConditionalCommand(
-                DriveCommands.driveToReef(drive, "K"),
-                DriveCommands.driveToReef(drive, "L"),
-                leftChooser::get));
+    // new Trigger(klChooser::get)
+    //     .onTrue(
+    //         DriveCommands.joystickDriveAtAngle(
+    //             drive,
+    //             () -> -driverController.getLeftY(),
+    //             () -> -driverController.getLeftX(),
+    //             () -> AllianceUtil.flipRotation2dAlliance(Rotation2d.fromDegrees(-60))))
+    //     .and(driverController.a())
+    //     .whileTrue(
+    //         new ConditionalCommand(
+    //             DriveCommands.driveToReef(drive, "K"),
+    //             DriveCommands.driveToReef(drive, "L"),
+    //             leftChooser::get));
 
     new Trigger(manualMode::get)
         .whileTrue(
