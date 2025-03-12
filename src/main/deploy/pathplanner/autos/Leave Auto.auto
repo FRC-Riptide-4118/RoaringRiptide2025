@@ -15,6 +15,12 @@
           "data": {
             "pathName": "Forward for test"
           }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "L2"
+          }
         }
       ]
     }

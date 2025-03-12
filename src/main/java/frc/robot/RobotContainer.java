@@ -423,7 +423,7 @@ public class RobotContainer {
                             : new Rotation2d())
                         : new Rotation2d())); // zero gyro
 
-    // Reset gyro to 0° when B button is pressed
+    // Reset gyro to 0°
     driverController.start().onTrue(Commands.runOnce(resetGyro, drive).ignoringDisable(true));
 
     driverController
