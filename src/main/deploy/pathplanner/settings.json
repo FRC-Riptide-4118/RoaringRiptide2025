@@ -4,11 +4,18 @@
   "holonomicMode": true,
   "pathFolders": [
     "FromLeftHP",
-    "StartToReef",
+    "Leave",
+    "Nothing",
     "Reef",
+    "StartToReef",
     "ToLeftHP"
   ],
-  "autoFolders": [],
+  "autoFolders": [
+    "Center score",
+    "Do nothing",
+    "Leave",
+    "Right Score"
+  ],
   "defaultMaxVel": 4.0,
   "defaultMaxAccel": 1.5,
   "defaultMaxAngVel": 540.0,

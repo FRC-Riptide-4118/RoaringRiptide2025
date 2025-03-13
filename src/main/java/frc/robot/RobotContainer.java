@@ -914,6 +914,16 @@ public class RobotContainer {
                             .withTimeout(0.0))));
 
     NamedCommands.registerCommand(
+        "Outtake Coral",
+        new FlywheelVoltageCommand(coralIntake, () -> 6.0)
+            .withName("Outtake")
+            .withTimeout(1)
+            .andThen(
+                new FlywheelVoltageCommand(coralIntake, () -> 0.0)
+                    .withName("Stop Coral Intake")
+                    .withTimeout(0.0)));
+
+    NamedCommands.registerCommand(
         "Flick",
         CoralCommands.CoralPresetCommand(elevator, wrist, CoralPresets.FLICK)
             .withName("Flick")

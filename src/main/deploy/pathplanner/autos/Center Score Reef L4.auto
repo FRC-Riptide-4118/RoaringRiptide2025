@@ -19,13 +19,13 @@
         {
           "type": "named",
           "data": {
-            "name": "L2"
+            "name": "L4"
           }
         }
       ]
     }
   },
   "resetOdom": false,
-  "folder": null,
+  "folder": "Center score",
   "choreoAuto": false
 }
