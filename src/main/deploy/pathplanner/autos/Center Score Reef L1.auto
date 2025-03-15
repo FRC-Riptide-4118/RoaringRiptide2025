@@ -11,6 +11,12 @@
           }
         },
         {
+          "type": "named",
+          "data": {
+            "name": "AlignToReef"
+          }
+        },
+        {
           "type": "path",
           "data": {
             "pathName": "Forward for test"
@@ -20,6 +26,12 @@
           "type": "named",
           "data": {
             "name": "L1"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Outtake Coral"
           }
         }
       ]

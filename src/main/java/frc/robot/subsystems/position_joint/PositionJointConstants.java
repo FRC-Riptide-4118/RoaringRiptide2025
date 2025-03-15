@@ -65,7 +65,7 @@ public class PositionJointConstants {
           "");
 
   public static final PositionJointGains WRIST_GAINS =
-      new PositionJointGains(2.0002, 0, 0, 0.005, 0.75, 1.0, 0, 3.0, 3.0, -0.15, 0.3, 0, 0.0);
+      new PositionJointGains(0.0, 0.0, 0, 0.0, 0.0, 0.0, 0, 3.0, 3.0, 0.0, 0.3, 0, 0.22);
 
   public static final PositionJointGains WRIST_GAINS_SIM =
       new PositionJointGains(0, 0, 0, 0, 0, 0.0, 0, 0.0, 0.0, 0.0, 1.0, 0, 0);
@@ -75,11 +75,12 @@ public class PositionJointConstants {
           new int[] {11},
           new boolean[] {false},
           9.0 / 1.0,
-          50,
+          45,
           GravityType.COSINE,
           EncoderType.EXTERNAL_CANCODER,
           2,
-          Rotation2d.fromRotations(-0.016846),
+          Rotation2d.fromRotations(-0.046875),
+          // new Rotation2d(),
           "");
 
   public static final PositionJointGains CLIMBER_GAINS =

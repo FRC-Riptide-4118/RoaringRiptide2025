@@ -410,6 +410,8 @@ public class RobotContainer {
                     ? -6.0
                     : driverController.rightBumper().getAsBoolean() ? 6.0 : 0.0));
 
+    led.setStatus(0.07);
+
     // beamBreak.getTrigger() ? 6.0 : 0.0)); fix later
 
     // Switch to X pattern when X button is pressed
