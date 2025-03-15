@@ -223,9 +223,8 @@ public class RobotContainer {
         vision =
             new Vision(
                 drive::addVisionMeasurement,
-                // new VisionIOPhotonVisionSim(
-                //     VisionConstants.camera0Name, VisionConstants.robotToCamera0,
-                // drive::getPose),
+                new VisionIOPhotonVisionSim(
+                    VisionConstants.camera0Name, VisionConstants.robotToCamera0, drive::getPose),
                 new VisionIOPhotonVisionSim(
                     VisionConstants.camera1Name, VisionConstants.robotToCamera1, drive::getPose));
 
@@ -358,6 +357,12 @@ public class RobotContainer {
     // Configure the button bindings
 
     configureButtonBindings();
+
+    //     if (beamBreak.getTrigger().getAsBoolean()) {
+    //       led.setStatus(0.07);
+    //     } else {
+    //       led.setStatus(0.0);
+    //     }
   }
 
   /**
@@ -385,6 +390,17 @@ public class RobotContainer {
                     * (driverController.getLeftTriggerAxis()
                         - driverController.getRightTriggerAxis())));
 
+    // coralIntake.setDefaultCommand(
+    //     new FlywheelVoltageCommand(
+    //         coralIntake,
+    //         () ->
+    //         beamBreak.getTrigger().getAsBoolean()
+    //             ? 6.0 * (driverController.getLeftTriggerAxis() -
+    // driverController.getRightTriggerAxis())
+    //             : 6.0 * driverController.getLeftTriggerAxis()
+    //     )
+    // );
+
     // Algae
     algaeIntake.setDefaultCommand(
         new FlywheelVoltageCommand(
@@ -393,6 +409,8 @@ public class RobotContainer {
                 driverController.leftBumper().getAsBoolean()
                     ? -6.0
                     : driverController.rightBumper().getAsBoolean() ? 6.0 : 0.0));
+
+    // beamBreak.getTrigger() ? 6.0 : 0.0)); fix later
 
     // Switch to X pattern when X button is pressed
     // driverController.x().onTrue(Commands.runOnce(drive::stopWithX, drive));
@@ -751,6 +769,7 @@ public class RobotContainer {
                   rightChooser.set(true);
                 }));
 
+    /*
     // new Trigger(abChooser::get)
     //     .onTrue(
     //         DriveCommands.joystickDriveAtAngle(
@@ -835,6 +854,7 @@ public class RobotContainer {
     //             DriveCommands.driveToReef(drive, "L"),
     //             leftChooser::get));
 
+    */
     new Trigger(manualMode::get)
         .whileTrue(
             new SelectCommand<String>(
@@ -902,6 +922,12 @@ public class RobotContainer {
             .withTimeout(0.7));
 
     NamedCommands.registerCommand(
+        "Human Player",
+        CoralCommands.CoralPresetCommand(elevator, wrist, CoralPresets.HUMAN_PLAYER)
+            .withName("Human Player")
+            .withTimeout(0.7));
+
+    NamedCommands.registerCommand(
         "Intake Coral",
         CoralCommands.CoralPresetCommand(elevator, wrist, CoralPresets.HUMAN_PLAYER)
             .alongWith(
@@ -925,7 +951,9 @@ public class RobotContainer {
 
     NamedCommands.registerCommand(
         "Flick",
-        CoralCommands.CoralPresetCommand(elevator, wrist, CoralPresets.FLICK)
+        new FlywheelVoltageCommand(coralIntake, () -> 6.0)
+            .withName("Outtake")
+            .alongWith(CoralCommands.CoralPresetCommand(elevator, wrist, CoralPresets.FLICK))
             .withName("Flick")
             .withTimeout(0.5));
 

@@ -17,7 +17,7 @@ public class LED extends SubsystemBase {
 
     name = led.getName();
 
-    kStatus = new LoggedTunableNumber(name + "/Status", 0);
+    kStatus = new LoggedTunableNumber(name + "/Status", 0.0);
   }
 
   @Override

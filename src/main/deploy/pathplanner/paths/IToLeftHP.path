@@ -3,13 +3,13 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 5.16528409090909,
-        "y": 5.166747159090908
+        "x": 5.1553125,
+        "y": 5.156775568181818
       },
       "prevControl": null,
       "nextControl": {
-        "x": 5.050236879781597,
-        "y": 5.388702423078465
+        "x": 5.040265288872507,
+        "y": 5.378730832169374
       },
       "isLocked": false,
       "linkedName": "IEnd"
@@ -47,7 +47,19 @@
   "rotationTargets": [],
   "constraintZones": [],
   "pointTowardsZones": [],
-  "eventMarkers": [],
+  "eventMarkers": [
+    {
+      "name": "Human Player",
+      "waypointRelativePos": 1.4038245219347645,
+      "endWaypointRelativePos": null,
+      "command": {
+        "type": "named",
+        "data": {
+          "name": "Human Player"
+        }
+      }
+    }
+  ],
   "globalConstraints": {
     "maxVelocity": 4.0,
     "maxAcceleration": 1.5,
