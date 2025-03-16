@@ -11,12 +11,6 @@
           }
         },
         {
-          "type": "named",
-          "data": {
-            "name": "AlignToReef"
-          }
-        },
-        {
           "type": "path",
           "data": {
             "pathName": "Forward for test"

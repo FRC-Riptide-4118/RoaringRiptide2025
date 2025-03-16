@@ -21,6 +21,12 @@
           "data": {
             "name": "L2"
           }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Outtake Coral"
+          }
         }
       ]
     }
