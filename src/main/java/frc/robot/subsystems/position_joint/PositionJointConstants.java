@@ -65,21 +65,20 @@ public class PositionJointConstants {
           "");
 
   public static final PositionJointGains WRIST_GAINS =
-      //   new PositionJointGains(0.0, 0.0, 0, 0.0, 0.0, 0.0, 0, 3.0, 3.0, 0.0, 0.3, 0, 0.22);
-      new PositionJointGains(2.0, 0, 0, 0, 0.7, 1.0, 0, 3.0, 3.0, 0.0, 0.3, 0, 0.1);
+      new PositionJointGains(2.0, 0, 0, 0, 0.7, 1.0, 0, 3.0, 3.0, 0.0, 0.3, 0, 0.2);
   public static final PositionJointGains WRIST_GAINS_SIM =
       new PositionJointGains(0, 0, 0, 0, 0, 0.0, 0, 0.0, 0.0, 0.0, 1.0, 0, 0);
 
   public static final PositionJointHardwareConfig WRIST_CONFIG =
       new PositionJointHardwareConfig(
           new int[] {11},
-          new boolean[] {false},
+          new boolean[] {true},
           16.0 / 1.0,
           45,
           GravityType.COSINE,
           EncoderType.EXTERNAL_CANCODER,
           2,
-          Rotation2d.fromRotations(-0.046875),
+          Rotation2d.fromRotations(-0.031982),
           // new Rotation2d(),
           "");
 
