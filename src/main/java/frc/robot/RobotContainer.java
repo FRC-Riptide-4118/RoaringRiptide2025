@@ -642,6 +642,14 @@ public class RobotContainer {
         .onTrue(new InstantCommand(() -> coralLevelIndicator.set("L4")));
 
     operatorController
+        .button(1)
+        .onTrue(new InstantCommand(() -> coralLevelIndicator.set("AlgaeL2_L3")));
+
+    operatorController
+        .button(2)
+        .onTrue(new InstantCommand(() -> coralLevelIndicator.set("AlgaeL3_L4")));
+
+    operatorController
         .button(10)
         .onTrue(new InstantCommand(() -> manualMode.set(true)))
         .onFalse(new InstantCommand(() -> manualMode.set(false)));
@@ -753,23 +761,23 @@ public class RobotContainer {
                 new InstantCommand(() -> reefStateIndicator.set("L")),
                 leftChooser::get));
 
-    operatorController
-        .button(1)
-        .onTrue(
-            new InstantCommand(
-                () -> {
-                  leftChooser.set(true);
-                  rightChooser.set(false);
-                }));
+    // operatorController
+    //     .button(1)
+    //     .onTrue(
+    //         new InstantCommand(
+    //             () -> {
+    //               leftChooser.set(true);
+    //               rightChooser.set(false);
+    //             }));
 
-    operatorController
-        .button(2)
-        .onTrue(
-            new InstantCommand(
-                () -> {
-                  leftChooser.set(false);
-                  rightChooser.set(true);
-                }));
+    // operatorController
+    //     .button(2)
+    //     .onTrue(
+    //         new InstantCommand(
+    //             () -> {
+    //               leftChooser.set(false);
+    //               rightChooser.set(true);
+    //             }));
 
     /*
     // new Trigger(abChooser::get)
@@ -874,7 +882,11 @@ public class RobotContainer {
                     "Zero",
                     CoralCommands.CoralPresetCommand(elevator, wrist, CoralPresets.ZERO),
                     "FLICK",
-                    CoralCommands.CoralPresetCommand(elevator, wrist, CoralPresets.FLICK)),
+                    CoralCommands.CoralPresetCommand(elevator, wrist, CoralPresets.FLICK),
+                    "AlgaeL2_L3",
+                    CoralCommands.CoralPresetCommand(elevator, wrist, CoralPresets.AlgaeL2_L3),
+                    "AlgaeL3_L4",
+                    CoralCommands.CoralPresetCommand(elevator, wrist, CoralPresets.AlgaeL3_L4)),
                 coralLevelIndicator::get));
   }
 
