@@ -81,6 +81,8 @@ public class RobotContainer {
 
   private final DigitalSensor beamBreak;
 
+  private final DigitalSensor climberLimitSwitch;
+
   @SuppressWarnings("unused")
   private final Vision vision;
 
@@ -195,6 +197,11 @@ public class RobotContainer {
                 new DigitalSensorIODigitialInput(
                     "Coral Wrist Beam Break", DigitalSensorConstants.BEAMBREAK_CONFIG));
 
+        climberLimitSwitch =
+            new DigitalSensor(
+                new DigitalSensorIODigitialInput(
+                    "Climber Limit Switch", DigitalSensorConstants.CLIMBER_LIMIT_SWITCH_CONFIG));
+
         // intakeSensor = new DigitalSensor(new DigitalSensorIO());
         break;
 
@@ -259,6 +266,11 @@ public class RobotContainer {
             new DigitalSensor(
                 new DigitalSensorIODigitialInput(
                     "Coral Wrist Beam Break", DigitalSensorConstants.BEAMBREAK_CONFIG));
+
+        climberLimitSwitch =
+            new DigitalSensor(
+                new DigitalSensorIODigitialInput(
+                    "Climber Limit Switch", DigitalSensorConstants.CLIMBER_LIMIT_SWITCH_CONFIG));
         break;
 
       default:
@@ -308,6 +320,10 @@ public class RobotContainer {
 
         beamBreak = new DigitalSensor(new DigitalSensorIOReplay("Coral Wrist Beam Break"));
 
+        climberLimitSwitch =
+            new DigitalSensor(
+                new DigitalSensorIODigitialInput(
+                    "Climber Limit Switch", DigitalSensorConstants.CLIMBER_LIMIT_SWITCH_CONFIG));
         break;
     }
 
@@ -412,8 +428,6 @@ public class RobotContainer {
 
     led.setStatus(0.07);
 
-    // beamBreak.getTrigger() ? 6.0 : 0.0)); fix later
-
     // Switch to X pattern when X button is pressed
     // driverController.x().onTrue(Commands.runOnce(drive::stopWithX, drive));
 
@@ -422,11 +436,13 @@ public class RobotContainer {
 
     operatorController
         .button(8)
+        .and(climberLimitSwitch.getTrigger().negate())
         .whileTrue(Commands.run(() -> climber.setVoltage(6.0)))
         .onFalse(new InstantCommand(() -> climber.setVoltage(0.0)));
 
     operatorController
         .button(7)
+        .and(climberLimitSwitch.getTrigger().negate())
         .whileTrue(Commands.run(() -> climber.setVoltage(-6.0)))
         .onFalse(new InstantCommand(() -> climber.setVoltage(0.0)));
 
